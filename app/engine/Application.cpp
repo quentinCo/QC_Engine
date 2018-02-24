@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <qc_graphic/Render/GLBuffer.hpp>
+
 
 /*-------------------- APPLICATION  CONSTRUCTOR ----------------------------------*/
 
@@ -25,7 +27,7 @@ Application::Application()
 	}
 
 	// Create window
-	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "qc_engine", nullptr, nullptr);
+	m_window = glfwCreateWindow(static_cast<int>(m_windowWidth), static_cast<int>(m_windowHeight), "qc_engine", nullptr, nullptr);
 
 	if (!m_window)
 	{
@@ -94,18 +96,16 @@ int Application::run()
 	
 	// Buffers
         // Vbo
-	GLuint vbo;
-	glCreateBuffers(1, &vbo);
-	glNamedBufferStorage(vbo, cube.points.size() * sizeof(qc_graphic::geometry::Vertex), cube.points.data(), 0);
+	qc_graphic::render::GLBuffer<qc_graphic::geometry::Vertex> vbo = qc_graphic::render::GLBuffer<qc_graphic::geometry::Vertex>(cube.points);
+
 	    // Ibo
-	GLuint ibo;
-	glCreateBuffers(1, &ibo);
-	glNamedBufferStorage(ibo, cube.indices.size() * sizeof(int), cube.indices.data(), 0);
+    qc_graphic::render::GLBuffer<int> ibo = qc_graphic::render::GLBuffer<int>(cube.indices);
+
 	    // Vao
 	GLuint vao;
 	glCreateVertexArrays(1, &vao);
 	int bindingVboIndex = 0;
-	glVertexArrayVertexBuffer(vao, bindingVboIndex, vbo, 0, sizeof(qc_graphic::geometry::Vertex)); // Link vao and vbo
+	glVertexArrayVertexBuffer(vao, bindingVboIndex, vbo.getPointer(), 0, sizeof(qc_graphic::geometry::Vertex)); // Link vao and vbo
 	int positionAttrLocation = 0;
 	glVertexArrayAttribBinding(vao, positionAttrLocation, bindingVboIndex); // Link vbo position attribute and vao
 	glEnableVertexArrayAttrib(vao, positionAttrLocation); // Active attribute
@@ -115,7 +115,7 @@ int Application::run()
     glEnableVertexArrayAttrib(vao, normalAttrLocation); 
     glVertexArrayAttribFormat(vao, normalAttrLocation, 4, GL_FLOAT, GL_FALSE, offsetof(qc_graphic::geometry::Vertex, normal));
 
-	glVertexArrayElementBuffer(vao, ibo); // Link vao and ibo;
+	glVertexArrayElementBuffer(vao, ibo.getPointer()); // Link vao and ibo;
 
     // Program
     GLuint vs = makeVertexShader();
@@ -132,7 +132,7 @@ int Application::run()
 
 	while (!glfwWindowShouldClose(m_window))
 	{
-        glViewport(0, 0, m_windowWidth, m_windowHeight);
+        glViewport(0, 0, static_cast<GLsizei>(m_windowWidth), static_cast<GLsizei>(m_windowHeight));
 
 		// Render here 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -154,7 +154,7 @@ int Application::run()
 		
         glBindVertexArray(vao);
 		
-		glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_INT, nullptr);
+		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cube.indices.size()), GL_UNSIGNED_INT, nullptr);
 
         modelMatrix = glm::rotate(modelMatrix, 0.01f, glm::vec3(1, 0, 0));
         modelMatrix = glm::rotate(modelMatrix, 0.005f, glm::vec3(0, 1, 0));

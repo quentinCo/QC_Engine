@@ -7,7 +7,7 @@
 #include <glm/matrix.hpp>
 #include <vector>
 
-#include <qc_graphic\Geometry\Vertex.hpp>
+#include <qc_graphic/Geometry/Vertex.hpp>
 
 class Application
 {
