@@ -96,7 +96,7 @@ int Application::run()
         // Vbo
 	GLuint vbo;
 	glCreateBuffers(1, &vbo);
-	glNamedBufferStorage(vbo, cube.points.size() * sizeof(Vertex), cube.points.data(), 0);
+	glNamedBufferStorage(vbo, cube.points.size() * sizeof(qc_graphic::geometry::Vertex), cube.points.data(), 0);
 	    // Ibo
 	GLuint ibo;
 	glCreateBuffers(1, &ibo);
@@ -105,15 +105,15 @@ int Application::run()
 	GLuint vao;
 	glCreateVertexArrays(1, &vao);
 	int bindingVboIndex = 0;
-	glVertexArrayVertexBuffer(vao, bindingVboIndex, vbo, 0, sizeof(Vertex)); // Link vao and vbo
+	glVertexArrayVertexBuffer(vao, bindingVboIndex, vbo, 0, sizeof(qc_graphic::geometry::Vertex)); // Link vao and vbo
 	int positionAttrLocation = 0;
 	glVertexArrayAttribBinding(vao, positionAttrLocation, bindingVboIndex); // Link vbo position attribute and vao
 	glEnableVertexArrayAttrib(vao, positionAttrLocation); // Active attribute
-	glVertexArrayAttribFormat(vao, positionAttrLocation, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
+	glVertexArrayAttribFormat(vao, positionAttrLocation, 4, GL_FLOAT, GL_FALSE, offsetof(qc_graphic::geometry::Vertex, position));
     int normalAttrLocation = 1;
     glVertexArrayAttribBinding(vao, normalAttrLocation, bindingVboIndex); 
     glEnableVertexArrayAttrib(vao, normalAttrLocation); 
-    glVertexArrayAttribFormat(vao, normalAttrLocation, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
+    glVertexArrayAttribFormat(vao, normalAttrLocation, 4, GL_FLOAT, GL_FALSE, offsetof(qc_graphic::geometry::Vertex, normal));
 
 	glVertexArrayElementBuffer(vao, ibo); // Link vao and ibo;
 
@@ -281,32 +281,32 @@ Application::Cube Application::makeCube()
 
 
     cube.points = {
-        Vertex(vertex[0], glm::vec4(1,0,0,0)),
-        Vertex(vertex[1], glm::vec4(1,0,0,0)),
-        Vertex(vertex[2], glm::vec4(1,0,0,0)),
-        Vertex(vertex[3], glm::vec4(1,0,0,0)),
-        Vertex(vertex[4], glm::vec4(-1,0,0,0)),
-        Vertex(vertex[5], glm::vec4(-1,0,0,0)),
-        Vertex(vertex[6], glm::vec4(-1,0,0,0)),
-        Vertex(vertex[7], glm::vec4(-1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[0], glm::vec4(1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[1], glm::vec4(1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[2], glm::vec4(1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[3], glm::vec4(1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[4], glm::vec4(-1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[5], glm::vec4(-1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[6], glm::vec4(-1,0,0,0)),
+        qc_graphic::geometry::Vertex(vertex[7], glm::vec4(-1,0,0,0)),
 
-        Vertex(vertex[0], glm::vec4(0,0,1,0)),
-        Vertex(vertex[1], glm::vec4(0,0,1,0)),
-        Vertex(vertex[7], glm::vec4(0,0,1,0)),
-        Vertex(vertex[6], glm::vec4(0,0,1,0)),
-        Vertex(vertex[2], glm::vec4(0,0,-1,0)),
-        Vertex(vertex[3], glm::vec4(0,0,-1,0)),
-        Vertex(vertex[5], glm::vec4(0,0,-1,0)),
-        Vertex(vertex[4], glm::vec4(0,0,-1,0)),
+        qc_graphic::geometry::Vertex(vertex[0], glm::vec4(0,0,1,0)),
+        qc_graphic::geometry::Vertex(vertex[1], glm::vec4(0,0,1,0)),
+        qc_graphic::geometry::Vertex(vertex[7], glm::vec4(0,0,1,0)),
+        qc_graphic::geometry::Vertex(vertex[6], glm::vec4(0,0,1,0)),
+        qc_graphic::geometry::Vertex(vertex[2], glm::vec4(0,0,-1,0)),
+        qc_graphic::geometry::Vertex(vertex[3], glm::vec4(0,0,-1,0)),
+        qc_graphic::geometry::Vertex(vertex[5], glm::vec4(0,0,-1,0)),
+        qc_graphic::geometry::Vertex(vertex[4], glm::vec4(0,0,-1,0)),
 
-        Vertex(vertex[0], glm::vec4(0,1,0,0)),
-        Vertex(vertex[2], glm::vec4(0,1,0,0)),
-        Vertex(vertex[4], glm::vec4(0,1,0,0)),
-        Vertex(vertex[6], glm::vec4(0,1,0,0)),
-        Vertex(vertex[1], glm::vec4(0,-1,0,0)),
-        Vertex(vertex[3], glm::vec4(0,-1,0,0)),
-        Vertex(vertex[5], glm::vec4(0,-1,0,0)),
-        Vertex(vertex[7], glm::vec4(0,-1,0,0))
+        qc_graphic::geometry::Vertex(vertex[0], glm::vec4(0,1,0,0)),
+        qc_graphic::geometry::Vertex(vertex[2], glm::vec4(0,1,0,0)),
+        qc_graphic::geometry::Vertex(vertex[4], glm::vec4(0,1,0,0)),
+        qc_graphic::geometry::Vertex(vertex[6], glm::vec4(0,1,0,0)),
+        qc_graphic::geometry::Vertex(vertex[1], glm::vec4(0,-1,0,0)),
+        qc_graphic::geometry::Vertex(vertex[3], glm::vec4(0,-1,0,0)),
+        qc_graphic::geometry::Vertex(vertex[5], glm::vec4(0,-1,0,0)),
+        qc_graphic::geometry::Vertex(vertex[7], glm::vec4(0,-1,0,0))
     };
 
     cube.indices = {

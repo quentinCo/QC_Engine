@@ -11,7 +11,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Lib files
-#[[
 		# qc_graphic
 	set(QC_GRAPHIC_DIR lib/qc_graphic)
 
@@ -46,7 +45,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 		FILES
 		${QC_GRAPHIC_SHADER_FILES}
 	)
-]]
+
+
 #set(LIBRARIES ${LIBRARIES} qc_graphic)
 #add_subdirectory(${QC_GRAPHIC_DIR})
 include_directories(${QC_GRAPHIC_DIR}/include)

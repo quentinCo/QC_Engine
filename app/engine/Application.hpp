@@ -7,6 +7,8 @@
 #include <glm/matrix.hpp>
 #include <vector>
 
+#include <qc_graphic\Geometry\Vertex.hpp>
+
 class Application
 {
 public:
@@ -29,27 +31,12 @@ private:
 	GLFWwindow* m_window;
 	
 	//-- Struct
-
-    struct Vertex
-    {
-        Vertex()
-            : position(0), normal(0)
-        {}
-
-        Vertex(const glm::vec4& pos, const glm::vec4& norm)
-            : position(pos), normal(norm)
-        {}
-
-        glm::vec4 position;
-        glm::vec4 normal;
-    };
-
 	struct Cube
 	{
 		Cube()
 		{}
 
-		std::vector<Vertex> points;
+		std::vector<qc_graphic::geometry::Vertex> points;
 		std::vector<int> indices;
 	};
     
