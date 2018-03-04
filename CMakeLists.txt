@@ -14,7 +14,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 		# qc_graphic
 	set(QC_GRAPHIC_DIR lib/qc_graphic)
 
-	file(GLOB_RECURSE
+	file(
+        GLOB_RECURSE
 		QC_GRAPHIC_SRC_FILES
 		${QC_GRAPHIC_DIR}/src/*.c
 		${QC_GRAPHIC_DIR}/src/*.cpp
@@ -47,7 +48,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 	)
 
 
-#set(LIBRARIES ${LIBRARIES} qc_graphic)
+set(LIBRARIES ${LIBRARIES} qc_graphic)
+
 #add_subdirectory(${QC_GRAPHIC_DIR})
 include_directories(${QC_GRAPHIC_DIR}/include)
 
