@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <qc_graphic/Render/GLBuffer.hpp>
+#include <qc_graphic/Render/VertexArray.hpp>
 
 
 /*-------------------- APPLICATION  CONSTRUCTOR ----------------------------------*/
@@ -102,20 +102,7 @@ int Application::run()
     qc_graphic::render::GLBuffer<int> ibo = qc_graphic::render::GLBuffer<int>(cube.indices);
 
 	    // Vao
-	GLuint vao;
-	glCreateVertexArrays(1, &vao);
-	int bindingVboIndex = 0;
-	glVertexArrayVertexBuffer(vao, bindingVboIndex, vbo.getPointer(), 0, sizeof(qc_graphic::geometry::Vertex)); // Link vao and vbo
-	int positionAttrLocation = 0;
-	glVertexArrayAttribBinding(vao, positionAttrLocation, bindingVboIndex); // Link vbo position attribute and vao
-	glEnableVertexArrayAttrib(vao, positionAttrLocation); // Active attribute
-	glVertexArrayAttribFormat(vao, positionAttrLocation, 4, GL_FLOAT, GL_FALSE, offsetof(qc_graphic::geometry::Vertex, position));
-    int normalAttrLocation = 1;
-    glVertexArrayAttribBinding(vao, normalAttrLocation, bindingVboIndex); 
-    glEnableVertexArrayAttrib(vao, normalAttrLocation); 
-    glVertexArrayAttribFormat(vao, normalAttrLocation, 4, GL_FLOAT, GL_FALSE, offsetof(qc_graphic::geometry::Vertex, normal));
-
-	glVertexArrayElementBuffer(vao, ibo.getPointer()); // Link vao and ibo;
+    qc_graphic::render::VertexArray vao = qc_graphic::render::VertexArray(vbo, ibo);
 
     // Program
     GLuint vs = makeVertexShader();
@@ -152,7 +139,7 @@ int Application::run()
         glm::mat4 normalMatrix = glm::transpose(glm::inverse(viewMatrix * modelMatrix));
         glUniformMatrix4fv(uNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 		
-        glBindVertexArray(vao);
+        vao.bindVertexArray();
 		
 		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cube.indices.size()), GL_UNSIGNED_INT, nullptr);
 
@@ -160,7 +147,7 @@ int Application::run()
         modelMatrix = glm::rotate(modelMatrix, 0.005f, glm::vec3(0, 1, 0));
         modelMatrix = glm::rotate(modelMatrix, 0.0025f, glm::vec3(0, 0, 1));
 
-		glBindVertexArray(0);
+        vao.unbindVertexArray();
 
 		glDisable(GL_DEPTH_TEST);
 
