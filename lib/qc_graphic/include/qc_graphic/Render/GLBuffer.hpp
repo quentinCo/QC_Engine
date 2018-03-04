@@ -1,3 +1,8 @@
+#pragma once
+
+#include <glad/glad.h>
+
+#include <vector>
 
 namespace qc_graphic
 {
@@ -13,9 +18,16 @@ class GLBuffer
 public:
 
     // Constructors
+    GLBuffer()
+        : pointer(0)
+    {}
+
     GLBuffer(const std::vector<T>& data)
+        : pointer(0)
     {
         glCreateBuffers(1, &pointer);
+        assert(pointer != 0);
+
         glNamedBufferStorage(pointer, data.size() * sizeof(T), data.data(), 0);
     }
 
@@ -57,12 +69,11 @@ public:
 
 
 private:
-    GLBuffer();
 
     GLuint pointer = 0;
 
 };
 
-}
+}// render
 
-}
+}// qc_graphic
