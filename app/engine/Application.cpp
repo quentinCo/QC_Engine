@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <qc_graphic/Render/VertexArray.hpp>
+#include <qc_graphic/Geometry/Transformation.hpp>
 
 
 /*-------------------- APPLICATION  CONSTRUCTOR ----------------------------------*/
@@ -105,17 +106,18 @@ int Application::run()
     qc_graphic::render::VertexArray vao = qc_graphic::render::VertexArray(vbo, ibo);
 
     // Program
-    GLuint vs = makeVertexShader();
-    GLuint fs = makeFragmentShader();
+    GLuint vs   = makeVertexShader();
+    GLuint fs   = makeFragmentShader();
     GLuint prog = makeProgram({ vs,fs });
 
     // Uniforms
-    GLuint uMVPMatrix = glGetUniformLocation(prog, "uMVPMatrix");
-    GLuint uColor = glGetUniformLocation(prog, "uColor");
-    GLuint uNormalMatrix = glGetUniformLocation(prog, "uNormalMatrix");
+    GLuint uMVPMatrix       = glGetUniformLocation(prog, "uMVPMatrix");
+    GLuint uColor           = glGetUniformLocation(prog, "uColor");
+    GLuint uNormalMatrix    = glGetUniformLocation(prog, "uNormalMatrix");
 
     // Matrices
-    glm::mat4 modelMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -4));
+    qc_graphic::geometry::Transformation transform = qc_graphic::geometry::Transformation();
+    transform.setPosition(0, 0, -4);
 
 	while (!glfwWindowShouldClose(m_window))
 	{
@@ -129,9 +131,11 @@ int Application::run()
         
         glUseProgram(prog);
 
-        glm::mat4 projMatrix = glm::perspective(70.f, float(m_windowWidth) / m_windowHeight, 0.01f, 100.f);
-        glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
-        glm::mat4 mvpMatrix = projMatrix * viewMatrix * modelMatrix;
+        glm::mat4 modelMatrix   = transform.getTransformMatrix();
+        glm::mat4 projMatrix    = glm::perspective(70.f, float(m_windowWidth) / m_windowHeight, 0.01f, 100.f);
+        glm::mat4 viewMatrix    = glm::lookAt(glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+        glm::mat4 mvpMatrix     = projMatrix * viewMatrix * modelMatrix;
+
         glUniformMatrix4fv(uMVPMatrix, 1, GL_FALSE, glm::value_ptr(mvpMatrix));
 
         glUniform4fv(uColor, 1, glm::value_ptr(glm::vec4(1, 1, 0, 1)));
@@ -143,9 +147,10 @@ int Application::run()
 		
 		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cube.indices.size()), GL_UNSIGNED_INT, nullptr);
 
-        modelMatrix = glm::rotate(modelMatrix, 0.01f, glm::vec3(1, 0, 0));
-        modelMatrix = glm::rotate(modelMatrix, 0.005f, glm::vec3(0, 1, 0));
-        modelMatrix = glm::rotate(modelMatrix, 0.0025f, glm::vec3(0, 0, 1));
+        const float angleX = 1 / 100.f;
+        const float angleY = 1 / 200.f;
+        const float angleZ = 1 / 400.f;
+        transform.rotate(angleX, angleY, angleZ);
 
         vao.unbindVertexArray();
 

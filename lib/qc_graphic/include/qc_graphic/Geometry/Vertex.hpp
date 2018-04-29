@@ -4,6 +4,7 @@
 
 namespace qc_graphic
 {
+
 namespace geometry
 {
 
