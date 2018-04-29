@@ -33,13 +33,15 @@ public:
     VertexArray(VertexArray&& o);
     VertexArray& operator=(VertexArray&& o);
 
-    void bindVertexArray()
+    void bindVertexArray() const
     {
+        assert(pointer != 0 && "You are trying to bind an uninitialised VertexArray");
         glBindVertexArray(pointer);
     }
 
-    void unbindVertexArray()
+    void unbindVertexArray() const
     {
+        assert(pointer != 0 && "You are trying to unbind an uninitialised VertexArray");
         glBindVertexArray(0);
     }
 

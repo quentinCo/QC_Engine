@@ -7,7 +7,7 @@ using namespace qc_graphic::render;
 VertexArray::VertexArray(GLBuffer<geometry::Vertex>& vbo, GLBuffer<int>& ibo)
     : pointer(0), vbo(std::move(vbo)), ibo(std::move(ibo))
 {
-    assert(this->vbo.getPointer() != 0 || this->ibo.getPointer() != 0);
+    assert((this->vbo.getPointer() != 0 || this->ibo.getPointer() != 0) && "You are trying to create VerteArray with uninitialised GLBuffer");
 
     glCreateVertexArrays(1, &pointer);
     assert(pointer != 0);

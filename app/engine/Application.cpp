@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <qc_graphic/Render/VertexArray.hpp>
+#include <qc_graphic/Geometry/Shapes/Shape.hpp>
 #include <qc_graphic/Geometry/Transformation.hpp>
 
 
@@ -96,14 +96,7 @@ int Application::run()
     std::cout << "]" << std::endl;
 	
 	// Buffers
-        // Vbo
-	qc_graphic::render::GLBuffer<qc_graphic::geometry::Vertex> vbo = qc_graphic::render::GLBuffer<qc_graphic::geometry::Vertex>(cube.points);
-
-	    // Ibo
-    qc_graphic::render::GLBuffer<int> ibo = qc_graphic::render::GLBuffer<int>(cube.indices);
-
-	    // Vao
-    qc_graphic::render::VertexArray vao = qc_graphic::render::VertexArray(vbo, ibo);
+    qc_graphic::geometry::shape::Shape shape = qc_graphic::geometry::shape::Shape(cube.points, cube.indices);
 
     // Program
     GLuint vs   = makeVertexShader();
@@ -143,6 +136,7 @@ int Application::run()
         glm::mat4 normalMatrix = glm::transpose(glm::inverse(viewMatrix * modelMatrix));
         glUniformMatrix4fv(uNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 		
+        const auto& vao = shape.getVao();
         vao.bindVertexArray();
 		
 		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cube.indices.size()), GL_UNSIGNED_INT, nullptr);
