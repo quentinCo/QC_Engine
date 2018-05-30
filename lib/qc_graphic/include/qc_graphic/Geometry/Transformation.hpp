@@ -49,9 +49,9 @@ public:
     }
 
     
-    void setPosition(const glm::vec3& position)
+    void setPosition(const glm::vec3& pos)
     {
-        this->position = position;
+        this->position = pos;
         modify = true;
     }
 
@@ -61,9 +61,9 @@ public:
         modify = true;
     }
 
-    void setRotate(const glm::vec3& rotation)
+    void setRotate(const glm::vec3& r)
     {
-        this->rotation = rotation;
+        this->rotation = r;
         modify = true;
     }
 
@@ -73,9 +73,9 @@ public:
         modify = true;
     }
 
-    void setScale(const glm::vec3& scale)
+    void setScale(const glm::vec3& s)
     {
-        this->scale = scale;
+        this->scale = s;
         modify = true;
     }
 
@@ -87,9 +87,9 @@ public:
 
 
 
-    void translate(const glm::vec3& position)
+    void translate(const glm::vec3& pos)
     {
-        this->position += position;
+        this->position += pos;
         modify = true;
     }
 
@@ -101,9 +101,9 @@ public:
         modify = true;
     }
 
-    void rotate(const glm::vec3& rotation)
+    void rotate(const glm::vec3& r)
     {
-        this->rotation += rotation;
+        this->rotation += r;
         modify = true;
     }
 

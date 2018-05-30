@@ -11,6 +11,6 @@ Shape::Shape(const std::vector<Vertex>& vertices, const std::vector<int>& indice
     render::GLBuffer<Vertex> vbo    = render::GLBuffer<Vertex>(vertices);
     render::GLBuffer<int> ibo       = render::GLBuffer<int>(indices);
 
-    vao = render::VertexArray(vbo, ibo);
+    this->vao = render::VertexArray(vbo, ibo);
 }
 
