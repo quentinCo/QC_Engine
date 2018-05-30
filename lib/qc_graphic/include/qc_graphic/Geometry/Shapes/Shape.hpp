@@ -33,17 +33,17 @@ public:
     Shape& operator= (Shape&& o)        = default;
 
 
-    const std::vector<Vertex>& getVertices()
+    const std::vector<Vertex>& getVertices() const
     {
         return vertices;
     }
 
-    const std::vector<int>& getIndices()
+    const std::vector<int>& getIndices() const
     {
         return indices;
     }
 
-    const qc_graphic::render::VertexArray& getVao()
+    const qc_graphic::render::VertexArray& getVao() const
     {
         return vao;
     }
