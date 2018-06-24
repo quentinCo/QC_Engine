@@ -1,7 +1,7 @@
 #pragma once
 
 #include <qc_graphic/Geometry/Transformation.hpp>
-#include <qc_graphic/Geometry/Shapes/Shape.hpp>
+#include <qc_graphic/Render/Shapes/Shape.hpp>
 
 namespace qc_graphic
 {
@@ -18,7 +18,7 @@ public:
 
     }
     
-    Object3d(const geometry::shape::Shape * s)
+    Object3d(const render::shape::Shape * s)
         : transformation()
     {
         assert(s != nullptr);
@@ -30,7 +30,7 @@ public:
         return transformation;
     }
 
-    const geometry::shape::Shape* getShape()
+    const render::shape::Shape* getShape()
     {
         return shape;
     }
@@ -40,7 +40,7 @@ public:
         transformation = t;
     }
 
-    void setShape(const geometry::shape::Shape* s)
+    void setShape(const render::shape::Shape* s)
     {
         shape = s;
     }
@@ -48,7 +48,7 @@ public:
 
 private:
     geometry::Transformation        transformation;
-    const geometry::shape::Shape*   shape;
+    const render::shape::Shape*     shape;
 
     //Materiaux
 };

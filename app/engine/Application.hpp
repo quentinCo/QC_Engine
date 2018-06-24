@@ -1,13 +1,11 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 // Temp
 #include <glm/matrix.hpp>
 #include <vector>
 
 #include <qc_graphic/Geometry/Vertex.hpp>
+#include <qc_graphic/Window.hpp>
 
 class Application
 {
@@ -28,7 +26,7 @@ private:
 	//-- Window
     const size_t m_windowWidth = 1280;
     const size_t m_windowHeight = 720;
-	GLFWwindow* m_window;
+    qc_graphic::Window window{1280, 720, "qc_engine"};
 	
 	//-- Struct
 	struct Cube
@@ -39,6 +37,15 @@ private:
 		std::vector<qc_graphic::geometry::Vertex> points;
 		std::vector<int> indices;
 	};
+
+    struct Plan
+    {
+        Plan()
+        {}
+
+        std::vector<qc_graphic::geometry::Vertex> points;
+        std::vector<int> indices;
+    };
     
 
 	//-- Function
@@ -47,5 +54,5 @@ private:
 	GLuint makeFragmentShader();
 	GLuint makeShader(GLuint type, const char* src);
 	Cube makeCube();
-
+    Plan makePlan();
 };

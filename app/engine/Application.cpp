@@ -6,64 +6,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <qc_graphic/Geometry/Shapes/Shape.hpp>
 #include <qc_graphic/Geometry/Transformation.hpp>
+#include <qc_graphic/Render/Shapes/Shape.hpp>
+#include <qc_graphic/Render/Object3d.hpp>
 
 
 /*-------------------- APPLICATION  CONSTRUCTOR ----------------------------------*/
 
 Application::Application()
-{
-
-	//
-	// GLFW
-	// -------------------------------------------------------------------------
-	
-	// Init glfw library
-	if (!glfwInit())
-	{
-		std::string errorMess = "Unable to init GLFW";
-		std::cerr << errorMess.c_str() << std::endl;
-		throw std::runtime_error(errorMess.c_str());
-	}
-
-	// Create window
-	m_window = glfwCreateWindow(static_cast<int>(m_windowWidth), static_cast<int>(m_windowHeight), "qc_engine", nullptr, nullptr);
-
-	if (!m_window)
-	{
-		std::string errorMess = "Unable to create window";
-		std::cerr << errorMess.c_str() << std::endl;
-		throw std::runtime_error(errorMess.c_str());
-	}
-
-	// Make window's context
-	glfwMakeContextCurrent(m_window);
-
-	// -------------------------------------------------------------------------
-
-
-	//
-	// GLAD
-	// -------------------------------------------------------------------------
-
-	// Init OpenGL
-	if (!gladLoadGL())
-	{
-		std::string errorMess = "Unable to init OpenGL";
-		std::cerr << errorMess.c_str() << std::endl;
-		throw std::runtime_error(errorMess.c_str());
-	}
-
-	// -------------------------------------------------------------------------
-
-}
+{}
 
 Application::~Application()
-{
-	glfwDestroyWindow(m_window);
-	glfwTerminate();
-}
+{}
 
 bool Application::waitKey()
 {
@@ -80,6 +34,7 @@ bool Application::waitKey()
 int Application::run()
 {
 	Cube cube = makeCube();
+    Plan plan = makePlan();
 	
 	std::cout << "point" << std::endl;
     for (auto& it : cube.points)
@@ -95,8 +50,13 @@ int Application::run()
     }
     std::cout << "]" << std::endl;
 	
-	// Buffers
-    qc_graphic::geometry::shape::Shape shape = qc_graphic::geometry::shape::Shape(cube.points, cube.indices);
+	// Object
+    static qc_graphic::render::shape::Shape cubeShape = qc_graphic::render::shape::Shape(cube.points, cube.indices);
+    static qc_graphic::render::shape::Shape planShape = qc_graphic::render::shape::Shape(plan.points, plan.indices);
+
+    qc_graphic::render::Object3d cubeObject = qc_graphic::render::Object3d(&cubeShape);
+    qc_graphic::render::Object3d planObject = qc_graphic::render::Object3d(&planShape);
+
 
     // Program
     GLuint vs   = makeVertexShader();
@@ -109,53 +69,74 @@ int Application::run()
     GLuint uNormalMatrix    = glGetUniformLocation(prog, "uNormalMatrix");
 
     // Matrices
-    qc_graphic::geometry::Transformation transform = qc_graphic::geometry::Transformation();
-    transform.setPosition(0, 0, -4);
+    auto& cubeTransform = cubeObject.getTransfomation();
+    cubeTransform.setPosition(0, 0, -4);
 
-	while (!glfwWindowShouldClose(m_window))
-	{
-        glViewport(0, 0, static_cast<GLsizei>(m_windowWidth), static_cast<GLsizei>(m_windowHeight));
+    auto& planTransform = planObject.getTransfomation();
+    //planTransform.setPosition(0, 0, -4);
+    planTransform.setScale(25, 0, 25);
+    planTransform.setPosition(0, -1, -4);
 
-		// Render here 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.25, 0, 0, 1);
+    while (window.shouldClose())
+    {
+        glViewport(0, 0, static_cast<GLsizei>(window.getWidth()), static_cast<GLsizei>(window.getHeight()));
 
-		glEnable(GL_DEPTH_TEST);
-        
+        // Render here 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.25, 0, 0, 1);
+
+        glEnable(GL_DEPTH_TEST);
+
         glUseProgram(prog);
 
-        glm::mat4 modelMatrix   = transform.getTransformMatrix();
-        glm::mat4 projMatrix    = glm::perspective(70.f, float(m_windowWidth) / m_windowHeight, 0.01f, 100.f);
-        glm::mat4 viewMatrix    = glm::lookAt(glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
-        glm::mat4 mvpMatrix     = projMatrix * viewMatrix * modelMatrix;
+        glm::mat4 projMatrix = glm::perspective(70.f, float(window.getWidth()) / window.getHeight(), 0.01f, 100.f);
+        glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
 
-        glUniformMatrix4fv(uMVPMatrix, 1, GL_FALSE, glm::value_ptr(mvpMatrix));
+        auto& drawObject = [&](qc_graphic::render::Object3d& object, const glm::vec4& color)
+        {
+            auto& transform = object.getTransfomation();
+            glm::mat4 modelMatrix = transform.getTransformMatrix();
+            glm::mat4 mvpMatrix = projMatrix * viewMatrix * modelMatrix;
 
-        glUniform4fv(uColor, 1, glm::value_ptr(glm::vec4(1, 1, 0, 1)));
+            glUniformMatrix4fv(uMVPMatrix, 1, GL_FALSE, glm::value_ptr(mvpMatrix));
 
-        glm::mat4 normalMatrix = glm::transpose(glm::inverse(viewMatrix * modelMatrix));
-        glUniformMatrix4fv(uNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
-		
-        const auto& vao = shape.getVao();
-        vao.bindVertexArray();
-		
-		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cube.indices.size()), GL_UNSIGNED_INT, nullptr);
+            glUniform4fv(uColor, 1, glm::value_ptr(color));
+
+            auto mat = viewMatrix * modelMatrix;
+            auto mat1 = glm::inverse(mat);
+            auto mat2 = glm::transpose(mat1);
+            glm::mat4 normalMatrix = glm::transpose(glm::inverse(viewMatrix * modelMatrix));
+            glUniformMatrix4fv(uNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+            const auto& mesh = object.getShape();
+            const auto& vao = mesh->getVao();
+            vao.bindVertexArray();
+
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->getNbIndices()), GL_UNSIGNED_INT, nullptr);
+
+            vao.unbindVertexArray();
+        };
+
+        // Draw cube
+        drawObject(cubeObject, glm::vec4(1, 1, 0, 1));
 
         const float angleX = 1 / 100.f;
         const float angleY = 1 / 200.f;
         const float angleZ = 1 / 400.f;
-        transform.rotate(angleX, angleY, angleZ);
+        cubeTransform.rotate(angleX, angleY, angleZ);
 
-        vao.unbindVertexArray();
 
-		glDisable(GL_DEPTH_TEST);
+        // Draw plan
+        drawObject(planObject, glm::vec4(0, 1, 1, 1));
+//        planTransform.rotate(angleX, 0, 0);
 
-		// Swap front and back buffers
-		glfwSwapBuffers(m_window);
+        glDisable(GL_DEPTH_TEST);
 
-		// Poll for and process events
-		glfwPollEvents();
-	}
+        window.swapBuffer();
+
+        // Poll for and process events
+        glfwPollEvents();
+    }
 	return 0;
 }
 
@@ -249,18 +230,18 @@ GLuint Application::makeShader(GLuint type, const char* src)
 Application::Cube Application::makeCube()
 {
     Cube cube;
-    int x = -1;
-    int y = -1;
-    int z = -1;
+    float x = -0.5;
+    float y = -0.5;
+    float z = -0.5;
     std::vector<glm::vec4> vertex;
     for (int i = 0; i < 8; ++i)
     {
         if (i % 4 == 0) x = -x;
         y = -y;
         if (i < 2 || i >= 6)
-            z = 1;
+            z = 0.5;
         else
-            z = -1;
+            z = -0.5;
 
         vertex.push_back(glm::vec4(x, y, z, 1));
     }
@@ -313,4 +294,23 @@ Application::Cube Application::makeCube()
     };
 
     return cube;
+}
+
+
+Application::Plan Application::makePlan()
+{
+    Plan plan;
+    plan.points = {
+        qc_graphic::geometry::Vertex(glm::vec4(0.5,0,0.5,1),    glm::vec4(0,1,0,0)),
+        qc_graphic::geometry::Vertex(glm::vec4(-0.5,0,0.5,1),   glm::vec4(0,1,0,0)),
+        qc_graphic::geometry::Vertex(glm::vec4(-0.5,0,-0.5,1),  glm::vec4(0,1,0,0)),
+        qc_graphic::geometry::Vertex(glm::vec4(0.5,0,-0.5,1),   glm::vec4(0,1,0,0))
+    };
+
+    plan.indices = {
+        0,1,2,
+        2,3,0
+    };
+
+    return plan;
 }

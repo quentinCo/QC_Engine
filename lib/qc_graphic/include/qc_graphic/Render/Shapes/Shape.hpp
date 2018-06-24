@@ -9,7 +9,7 @@
 namespace qc_graphic
 {
 
-namespace geometry
+namespace render
 {
 
 namespace shape
@@ -21,7 +21,7 @@ public:
     Shape()
     {};
 
-    Shape(const std::vector<Vertex>& vertices, const std::vector<int>& indices);
+    Shape(const std::vector<geometry::Vertex>& vertices, const std::vector<int>& indices);
     
     ~Shape()
     {};
@@ -33,7 +33,7 @@ public:
     Shape& operator= (Shape&& o)        = default;
 
 
-    const std::vector<Vertex>& getVertices() const
+    const std::vector<geometry::Vertex>& getVertices() const
     {
         return vertices;
     }
@@ -41,6 +41,16 @@ public:
     const std::vector<int>& getIndices() const
     {
         return indices;
+    }
+
+    size_t getNbVertices() const
+    {
+        return vertices.size();
+    }
+
+    size_t getNbIndices() const
+    {
+        return indices.size();
     }
 
     const qc_graphic::render::VertexArray& getVao() const
@@ -55,15 +65,15 @@ public:
     */
 
 
-private:
-    std::vector<Vertex>             vertices;
+protected:
+    std::vector<geometry::Vertex>   vertices;
     std::vector<int>                indices;
 
     qc_graphic::render::VertexArray vao;
 };
 
 
-}// shape
+}// render
 
 }// geometry
 
