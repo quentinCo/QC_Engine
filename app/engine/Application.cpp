@@ -14,7 +14,11 @@
 /*-------------------- APPLICATION  CONSTRUCTOR ----------------------------------*/
 
 Application::Application()
-{}
+{
+    glm::vec3 pos = { 0,0,0 };
+    glm::vec3 front = { 0,0,-1 };
+    camera = qc_graphic::Camera(pos, 0.01, 100, 70, window.getWidth(), window.getHeight(), front);
+}
 
 Application::~Application()
 {}
@@ -73,7 +77,6 @@ int Application::run()
     cubeTransform.setPosition(0, 0, -4);
 
     auto& planTransform = planObject.getTransfomation();
-    //planTransform.setPosition(0, 0, -4);
     planTransform.setScale(25, 0, 25);
     planTransform.setPosition(0, -1, -4);
 
@@ -89,8 +92,8 @@ int Application::run()
 
         glUseProgram(prog);
 
-        glm::mat4 projMatrix = glm::perspective(70.f, float(window.getWidth()) / window.getHeight(), 0.01f, 100.f);
-        glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+        glm::mat4 viewMatrix = camera.getViewMatrix();
+        glm::mat4 projMatrix = camera.getProjMatrix();
 
         auto& drawObject = [&](qc_graphic::render::Object3d& object, const glm::vec4& color)
         {

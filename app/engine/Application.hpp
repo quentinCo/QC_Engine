@@ -6,6 +6,7 @@
 
 #include <qc_graphic/Geometry/Vertex.hpp>
 #include <qc_graphic/Window.hpp>
+#include <qc_graphic/Camera.hpp>
 
 class Application
 {
@@ -27,6 +28,7 @@ private:
     const size_t m_windowWidth = 1280;
     const size_t m_windowHeight = 720;
     qc_graphic::Window window{1280, 720, "qc_engine"};
+    qc_graphic::Camera camera;
 	
 	//-- Struct
 	struct Cube

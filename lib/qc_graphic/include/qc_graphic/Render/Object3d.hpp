@@ -13,13 +13,11 @@ class Object3d
 {
 public:
     Object3d()
-        : transformation()
-    {
-
-    }
+        : shape(nullptr)
+    {}
     
     Object3d(const render::shape::Shape * s)
-        : transformation()
+        : shape(nullptr)
     {
         assert(s != nullptr);
         shape = s;

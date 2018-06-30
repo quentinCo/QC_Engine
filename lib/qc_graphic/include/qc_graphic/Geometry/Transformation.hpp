@@ -17,11 +17,11 @@ class Transformation
 
 public:
     Transformation()
-        : position(0), rotation(0), scale(1), transformMatrix(1), modify(false)
+        : position(0), rotation(0), scale(1), transformMatrix(1), isModified(false)
     {}
 
     Transformation(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
-        : position(position), rotation(rotation), scale(scale), transformMatrix(1), modify(false)
+        : position(position), rotation(rotation), scale(scale), transformMatrix(1), isModified(false)
     {
         computeTransformMatrix();
     }
@@ -44,7 +44,7 @@ public:
     
     const glm::mat4& getTransformMatrix()
     {
-        if(modify)
+        if(isModified)
             computeTransformMatrix();
         
         return transformMatrix;
@@ -54,31 +54,31 @@ public:
     void setPosition(const glm::vec3& pos)
     {
         this->position = pos;
-        modify = true;
+        isModified = true;
     }
 
     void setPosition(float x, float y, float z)
     {
         this->position = glm::vec3(x, y, z);
-        modify = true;
+        isModified = true;
     }
 
     void setRotate(const glm::vec3& r)
     {
         this->rotation = r;
-        modify = true;
+        isModified = true;
     }
 
     void setRotate(float x, float y, float z)
     {
         this->rotation = glm::vec3(x, y, z);
-        modify = true;
+        isModified = true;
     }
 
     void setScale(const glm::vec3& s)
     {
         this->scale = s;
-        modify = true;
+        isModified = true;
     }
 
     void setScale(float x, float y, float z)
@@ -87,7 +87,7 @@ public:
         y = std::max(y, 1.f);
         z = std::max(z, 1.f);
         this->scale = glm::vec3(x, y, z);
-        modify = true;
+        isModified = true;
     }
 
 
@@ -95,7 +95,7 @@ public:
     void translate(const glm::vec3& pos)
     {
         this->position += pos;
-        modify = true;
+        isModified = true;
     }
 
     void translate(float x, float y, float z)
@@ -103,13 +103,13 @@ public:
         this->position.x += x;
         this->position.y += y;
         this->position.z += z;
-        modify = true;
+        isModified = true;
     }
 
     void rotate(const glm::vec3& r)
     {
         this->rotation += r;
-        modify = true;
+        isModified = true;
     }
 
     void rotate(float x, float y, float z)
@@ -117,8 +117,14 @@ public:
         rotation.x += x;
         rotation.y += y;
         rotation.z += z;
-        modify = true;
+        isModified = true;
     }
+
+    bool hasBeenModified()
+    {
+        return isModified;
+    }
+
 
 private:
     glm::vec3 position;
@@ -127,7 +133,7 @@ private:
 
     glm::mat4 transformMatrix;
 
-    bool modify;
+    bool isModified;
 
     void computeTransformMatrix()
     {
@@ -139,7 +145,7 @@ private:
 
         transformMatrix = glm::scale(transformMatrix, scale);
 
-        modify = false;
+        isModified = false;
     }
 
 };
