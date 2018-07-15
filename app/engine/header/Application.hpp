@@ -3,10 +3,13 @@
 // Temp
 #include <glm/matrix.hpp>
 #include <vector>
+#include <ctime>
 
 #include <qc_graphic/Geometry/Vertex.hpp>
 #include <qc_graphic/Window.hpp>
 #include <qc_graphic/Camera.hpp>
+
+#include <Controller/CameraController.hpp>
 
 class Application
 {
@@ -29,6 +32,10 @@ private:
     const size_t m_windowHeight = 720;
     qc_graphic::Window window{1280, 720, "qc_engine"};
     qc_graphic::Camera camera;
+    app::controller::CameraController cameraController;
+
+    clock_t time;
+    float elapsedTime;
 	
 	//-- Struct
 	struct Cube

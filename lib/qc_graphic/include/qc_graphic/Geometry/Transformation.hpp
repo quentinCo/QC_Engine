@@ -92,9 +92,9 @@ public:
 
 
 
-    void translate(const glm::vec3& pos)
+    void translate(const glm::vec3& transaltion)
     {
-        this->position += pos;
+        this->position += transaltion;
         isModified = true;
     }
 

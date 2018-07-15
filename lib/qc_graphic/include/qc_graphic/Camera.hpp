@@ -14,84 +14,84 @@ public:
 
     geometry::Transformation& getTransfomation()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return transformation;
     }
 
     float getWidth()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return width;
     }
 
     float getHeight()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return height;
     }
 
     float getAspectRatio()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return aspectRatio;
     }
 
     float getNear()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return nearPlan;
     }
 
     float getFar()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return farPlan;
     }
 
     float getFov()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return fov;
     }
 
     const glm::vec3& getFrontVector()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return frontVector;
     }
 
     const glm::vec3& getUpVector()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return upVector;
     }
 
     const glm::vec3& getLeftVector()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return leftVector;
     }
 
     const glm::mat4& getViewMatrix()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return viewMatrix;
     }
 
     const glm::mat4& getProjMatrix()
     {
-        if (isModified)
+        if (isModified || transformation.hasBeenModified())
             updateCameraProperties();
         return projMatrix;
     }
@@ -128,7 +128,7 @@ public:
 
     bool hasBeenModified()
     {
-        return isModified;
+        return isModified || transformation.hasBeenModified();
     }
 
 private:

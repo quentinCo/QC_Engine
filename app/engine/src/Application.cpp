@@ -1,8 +1,9 @@
-#include "Application.hpp"
+#include <Application.hpp>
 
 #include <iostream>
 
 #include <memory>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -15,9 +16,14 @@
 
 Application::Application()
 {
-    glm::vec3 pos = { 0,0,0 };
-    glm::vec3 front = { 0,0,-1 };
-    camera = qc_graphic::Camera(pos, 0.01, 100, 70, window.getWidth(), window.getHeight(), front);
+    glm::vec3 pos       = { 0,0,0 };
+    glm::vec3 front     = { 0,0,-1 };
+    camera              = qc_graphic::Camera(pos, 0.01, 100, 70, window.getWidth(), window.getHeight(), front);
+    cameraController    = app::controller::CameraController(camera, window);
+    
+
+    time                = clock();
+    elapsedTime         = 0.0;
 }
 
 Application::~Application()
@@ -80,8 +86,18 @@ int Application::run()
     planTransform.setScale(25, 0, 25);
     planTransform.setPosition(0, -1, -4);
 
+
     while (window.shouldClose())
     {
+        clock_t currentTime = clock();
+        elapsedTime         = (static_cast<float>(currentTime - time)) / CLOCKS_PER_SEC;
+        time                = currentTime;
+
+        // Update
+        cameraController.updateController(elapsedTime);
+
+
+        // Draw
         glViewport(0, 0, static_cast<GLsizei>(window.getWidth()), static_cast<GLsizei>(window.getHeight()));
 
         // Render here 
@@ -97,18 +113,17 @@ int Application::run()
 
         auto& drawObject = [&](qc_graphic::render::Object3d& object, const glm::vec4& color)
         {
-            auto& transform = object.getTransfomation();
-            glm::mat4 modelMatrix = transform.getTransformMatrix();
-            glm::mat4 mvpMatrix = projMatrix * viewMatrix * modelMatrix;
+            auto& transform         = object.getTransfomation();
+            glm::mat4 modelMatrix   = transform.getTransformMatrix();
+            glm::mat4 mvMatix       = viewMatrix * modelMatrix;
+            glm::mat4 mvpMatrix     = projMatrix * mvMatix;
+            glm::mat4 normalMatrix = glm::transpose(glm::inverse(mvMatix));
+            //glm::mat4 normalMatrix  = glm::transpose(glm::inverse(modelMatrix));
 
             glUniformMatrix4fv(uMVPMatrix, 1, GL_FALSE, glm::value_ptr(mvpMatrix));
 
             glUniform4fv(uColor, 1, glm::value_ptr(color));
 
-            auto mat = viewMatrix * modelMatrix;
-            auto mat1 = glm::inverse(mat);
-            auto mat2 = glm::transpose(mat1);
-            glm::mat4 normalMatrix = glm::transpose(glm::inverse(viewMatrix * modelMatrix));
             glUniformMatrix4fv(uNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
             const auto& mesh = object.getShape();
@@ -210,6 +225,7 @@ R"(
     void main()
     {
         fColor = dot(vNormal, vec4(0,1,0,1)) * uColor;
+        //fColor = vec4(vNormal.xyz, 1);
     }
 )";
 

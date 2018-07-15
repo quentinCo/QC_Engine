@@ -144,6 +144,8 @@ include_directories(${GLM_DIR})
 # App files
 set(APP_DIR "app/engine")
 
+include_directories(${APP_DIR}/header/)
+
 file(GLOB_RECURSE APP_SRC_FILES ${APP_DIR}/*.c ${APP_DIR}/*.cpp)
 file(GLOB_RECURSE APP_INCLUDE_FILES ${APP_DIR}/*.h ${APP_DIR}/*.hpp)
 

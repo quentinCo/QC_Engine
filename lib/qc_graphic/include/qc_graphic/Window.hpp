@@ -25,6 +25,11 @@ public:
         return height;
     }
 
+    GLFWwindow* getGLFWwindow()
+    {
+        return glfwWindow;
+    }
+
     bool shouldClose();
     void swapBuffer();
 
