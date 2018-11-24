@@ -1,72 +1,107 @@
-#include <qc_graphic/Window.hpp>
+#include<qc_graphic\Window.hpp>
 
-#include <iostream>
+#include<iostream>
 
+#include<qc_graphic\Useful.hpp>
 
-using namespace qc_graphic;
+using namespace qc;
 
-Window::Window(size_t w, size_t h)
-    : Window(w,h,"Unnamed Window")
+/*-------------------- WINDOW  CONSTRUCTOR ----------------------------------*/
+Window::Window()
+    : Window(0, 0, "No Name")
 {}
 
-Window::Window(size_t w, size_t h, std::string name)
-{
-    initGLFW();
-    initWindow(w, h, name);
-    initOpenGL();
-    
-    width   = w;
-    height  = h;
-}
+Window::Window(int width, int height, const std::string & name)
+    : glwfWindow(nullptr), width(width), height(height), name(name), shouldClose(false),
+        frameDuration(0), fps(0)
+{}
 
 Window::~Window()
 {
-    glfwDestroyWindow(glfwWindow);
+    if(this->glwfWindow)
+        glfwDestroyWindow(this->glwfWindow);
+    
     glfwTerminate();
 }
 
-bool Window::shouldClose()
+
+/*-------------------- WINDOW  GETTERS / SETTERS ----------------------------------*/
+bool Window::getShouldClose()
 {
-    return !glfwWindowShouldClose(glfwWindow);
+    return this->shouldClose;
 }
 
-void Window::swapBuffer()
+float Window::getFrameDuration()
 {
-    // Swap front and back buffers
-    glfwSwapBuffers(glfwWindow);
+    return this->frameDuration;
 }
 
-void Window::initGLFW()
+float Window::getFps()
 {
-    if (!glfwInit())
+    return this->fps;
+}
+
+
+
+/*-------------------- WINDOW  INITIALISATION ----------------------------------*/
+static void HelperGLFWError(int error, const char* description)
+{
+    std::string errorMess = "[ GLFW ] ";
+    errorMess += description;
+    qc::Useful::printError(errorMess);
+}
+
+bool Window::init()
+{
+    std::cout << "Window compiled against GLFW " << GLFW_VERSION_MAJOR << " " << GLFW_VERSION_MINOR << " " << GLFW_VERSION_REVISION << std::endl;
+
+    // Set callback for glfw errors
+    glfwSetErrorCallback(HelperGLFWError);
+
+    int res = glfwInit();
+    if (res != GLFW_TRUE)
     {
-        std::string errorMess = "Unable to init GLFW";
-        std::cerr << errorMess.c_str() << std::endl;
-        throw std::runtime_error(errorMess.c_str());
+        return false;
     }
+
+    // Create glfw window
+    GLFWwindow* glwfWindow = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+    if (glwfWindow == nullptr)
+    {
+        qc::Useful::printError("glfwCreateWindow return nullptr");
+        return false;
+    }
+
+    // Make it current
+    glfwMakeContextCurrent(glwfWindow);
+
+    // Init Window properties
+    this->glwfWindow = glwfWindow;
+
+    this->initClock = std::chrono::system_clock::now();
+    this->prevFrameClock = this->initClock;
+
+    qc::Useful::printValid("Window INITIALISED");
+    return true;
 }
 
-void Window::initWindow(int w, int h, std::string name)
+
+/*-------------------- WINDOW  UPDATE ----------------------------------*/
+void Window::update()
 {
-    glfwWindow = glfwCreateWindow(static_cast<int>(w), static_cast<int>(h), name.c_str(), nullptr, nullptr);
+    // Swap buffer (rendering)
+    glfwSwapBuffers(this->glwfWindow);
 
-    if (!glfwWindow)
-    {
-        std::string errorMess = "Unable to create window";
-        std::cerr << errorMess.c_str() << std::endl;
-        throw std::runtime_error(errorMess.c_str());
-    }
+    // Inputs
+    glfwPollEvents();
 
-    // Make window's context
-    glfwMakeContextCurrent(glfwWindow);
-}
+    this->shouldClose = glfwWindowShouldClose(this->glwfWindow);
 
-void Window::initOpenGL()
-{
-    if (!gladLoadGL())
-    {
-        std::string errorMess = "Unable to init OpenGL";
-        std::cerr << errorMess.c_str() << std::endl;
-        throw std::runtime_error(errorMess.c_str());
-    }
+    // Time datas
+    auto currentClock = std::chrono::system_clock::now();
+
+    std::chrono::duration<float> elapseTime = currentClock - this->prevFrameClock;
+    this->frameDuration                     = 1000 * elapseTime.count();
+    this->fps                               = 1000 / this->frameDuration;
+    this->prevFrameClock                    = currentClock;
 }

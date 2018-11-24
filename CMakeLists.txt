@@ -141,6 +141,7 @@ include_directories(${GLM_DIR})
 	#set(LIBRARIES ${LIBRARIES} stb)
 	include_directories(${STB_DIR})
 ]]
+
 # App files
 set(APP_DIR "app/engine")
 

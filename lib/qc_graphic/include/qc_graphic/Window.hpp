@@ -1,47 +1,48 @@
 #pragma once
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <string>
 
-namespace qc_graphic
+#include <string>
+#include <chrono>
+
+namespace qc
 {
 
 class Window
 {
 public:
-    Window(size_t w = 1280, size_t h = 720);
-    Window(size_t w, size_t h, std::string name);
+    // Constructors
+    Window();
+    Window(int width, int height, const std::string & name);
 
     ~Window();
 
-    size_t getWidth()
-    {
-        return width;
-    }
+    // Getters / Setters
+    bool    getShouldClose();
+    float   getFrameDuration();
+    float   getFps();
 
-    size_t getHeight()
-    {
-        return height;
-    }
-
-    GLFWwindow* getGLFWwindow()
-    {
-        return glfwWindow;
-    }
-
-    bool shouldClose();
-    void swapBuffer();
+    // Functions
+    bool init();
+    void update();
 
 private:
-    size_t      width;
-    size_t      height;
-    GLFWwindow* glfwWindow;
+    // Properties
+    GLFWwindow*     glwfWindow;
+    int             width;
+    int             height;
+    std::string     name;
+    
+    // Events
+    bool            shouldClose;
 
+    // Duration datas
+    std::chrono::system_clock::time_point   initClock;
+    std::chrono::system_clock::time_point   prevFrameClock;
+    float                                   frameDuration;  // In ms
+    float                                   fps;
 
-    void initGLFW();
-    void initWindow(int w, int h, std::string name);
-    void initOpenGL();
 };
 
-}// qc_graphic
+};  //! namespace qc
+
