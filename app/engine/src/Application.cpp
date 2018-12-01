@@ -4,22 +4,19 @@
 
 #include <memory>
 
-#include <GLFW/glfw3.h>
-
 #include <string>
 #include <chrono>
 
-#include <qc_graphic\Useful.hpp>
 #include <qc_graphic\Window.hpp>
+#include <qc_graphic\Useful.hpp>
 
 static qc::Window window;
-
 
 /*-------------------- APPLICATION  CONSTRUCTOR ----------------------------------*/
 
 Application::Application()
 {
-    window = qc::Window(1200, 480, "QC Engine");
+    window          = qc::Window(1600, 900, "QC Engine");
 }
 
 Application::~Application()
@@ -34,11 +31,10 @@ int Application::run()
     {
         return 0;
     }
-
+    
     while (window.getShouldClose() == false)
     {
         window.update();
-        qc::Useful::printValid(window.getFrameDuration());
     }
 
     return 0;
