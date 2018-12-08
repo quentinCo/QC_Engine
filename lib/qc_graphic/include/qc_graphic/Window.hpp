@@ -19,9 +19,11 @@ public:
     ~Window();
 
     // Getters / Setters
-    bool    getShouldClose() const;
-    float   getFrameDuration() const;
-    float   getFps() const;
+    GLFWwindow* getGLFWwindow() const;
+    bool        getShouldClose() const;
+    float       getFrameDuration() const;
+    float       getFrameDurationSecond() const;
+    float       getFps() const;
 
     // Functions
     bool init();

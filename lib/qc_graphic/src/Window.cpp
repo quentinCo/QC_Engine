@@ -45,6 +45,11 @@ Window::~Window()
 
 
 /*-------------------- WINDOW  GETTERS / SETTERS ----------------------------------*/
+GLFWwindow* Window::getGLFWwindow() const
+{
+    return this->glwfWindow;
+}
+
 bool Window::getShouldClose() const
 {
     return this->shouldClose;
@@ -53,6 +58,11 @@ bool Window::getShouldClose() const
 float Window::getFrameDuration() const
 {
     return this->frameDuration;
+}
+
+float Window::getFrameDurationSecond() const
+{
+    return static_cast<float>(0.001 * this->frameDuration);
 }
 
 float Window::getFps() const
