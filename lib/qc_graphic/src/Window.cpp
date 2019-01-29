@@ -73,11 +73,55 @@ float Window::getFps() const
 
 
 /*-------------------- WINDOW  INITIALISATION ----------------------------------*/
-static void HelperGLFWError(int error, const char* description)
+static void HelperGLFWErrorCallBack(int error, const char* description)
 {
-    std::string errorMess = "[ GLFW ] ";
-    errorMess += description;
-    qc::Useful::PrintError(errorMess);
+    qc::Useful::PrintError("GLFW", description);
+}
+
+static void HelperOpenGLErrorCallBack(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) 
+{
+    std::string errorMess = "Type: ";
+    switch (type) {
+        case GL_DEBUG_TYPE_ERROR:
+            errorMess += "ERROR";
+            break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+            errorMess += "DEPRECATED_BEHAVIOR";
+            break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+            errorMess += "UNDEFINED_BEHAVIOR";
+            break;
+        case GL_DEBUG_TYPE_PORTABILITY:
+            errorMess += "PORTABILITY";
+            break;
+        case GL_DEBUG_TYPE_PERFORMANCE:
+            errorMess += "PERFORMANCE";
+            break;
+        case GL_DEBUG_TYPE_OTHER:
+            errorMess += "OTHER";
+            break;
+        default:
+            errorMess += "UNKNOW ERROR";
+            break;
+    }
+
+    errorMess += " | Severity: ";
+    switch (severity) {
+        case GL_DEBUG_SEVERITY_LOW:
+            errorMess += "LOW";
+            break;
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            errorMess += "MEDIUM";
+            break;
+        case GL_DEBUG_SEVERITY_HIGH:
+            errorMess += "HIGH";
+            break;
+    }
+
+    errorMess += "\n";
+    errorMess += " Message: " + std::string(message);
+
+    qc::Useful::PrintError("OPENGL", errorMess);
 }
 
 bool Window::init()
@@ -85,7 +129,7 @@ bool Window::init()
     std::cout << "Window compiled against GLFW " << GLFW_VERSION_MAJOR << "." << GLFW_VERSION_MINOR << "." << GLFW_VERSION_REVISION << std::endl;
 
     // Set callback for glfw errors
-    glfwSetErrorCallback(HelperGLFWError);
+    glfwSetErrorCallback(HelperGLFWErrorCallBack);
 
     int res = glfwInit();
     if (res != GLFW_TRUE)
@@ -112,7 +156,19 @@ bool Window::init()
     res = initOpenGL();
     if (res == false)
         return false;
-   
+
+    // Init error handling
+#if _DEBUG
+    // TODO move it in external helper, to remove every Opengl from the class
+    if (glDebugMessageCallback)
+    {
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(HelperOpenGLErrorCallBack, 0);       // Opengl 4.3
+        GLuint unusedIds = 0;
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, &unusedIds, true);
+    }
+#endif
+
     // Init clocks
     this->initClocks();
 
