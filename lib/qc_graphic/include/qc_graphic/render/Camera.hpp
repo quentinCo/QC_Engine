@@ -50,7 +50,7 @@ private:
     glm::vec3 rightVector;
     glm::vec3 upVector;
 
-    glm::vec3 angles;
+    glm::vec3 angles;           // Radian
 
     glm::mat4 viewMatrix;
  

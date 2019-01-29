@@ -40,7 +40,7 @@ Program& Program::operator= (Program&& r)
     return *this;
 }
 
-/*-------------------- BUFFEROBJECT GETTERS ---------------------------------*/
+/*-------------------- PROGRAM GETTERS ---------------------------------*/
 
 GLint Program::getUniformLocation(const char* name) const
 {
@@ -52,7 +52,7 @@ GLint Program::getRessourcesIndex(GLenum glInterface, const char* name) const
     return glGetProgramResourceIndex(this->id, glInterface, name);
 }
 
-/*-------------------- BUFFEROBJECT FUNCTIONS ---------------------------------*/
+/*-------------------- PROGRAM FUNCTIONS ---------------------------------*/
 bool Program::attach(std::initializer_list<std::reference_wrapper<const Shader>> shaders)
 {
     bool res = true;
