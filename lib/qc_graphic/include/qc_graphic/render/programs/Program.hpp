@@ -41,6 +41,40 @@ public:
         return this->id;
     }
 
+    GLint getUniformLocation(const std::string& name) const
+    {
+        return getUniformLocation(name.c_str());
+    }
+
+    GLint getUniformLocation(const char* name) const;
+
+    GLint getSSBOIndex(const std::string& name) const
+    {
+        return getRessourcesIndex(GL_SHADER_STORAGE_BLOCK, name);
+    }
+
+    GLint getSSBOIndex(const char* name) const
+    {
+        return getRessourcesIndex(GL_SHADER_STORAGE_BLOCK, name);
+    }
+
+    GLint getUBOIndex(const std::string& name) const
+    {
+        return getRessourcesIndex(GL_UNIFORM_BLOCK, name);
+    }
+
+    GLint getUBOIndex(const char* name) const
+    {
+        return getRessourcesIndex(GL_UNIFORM_BLOCK, name);
+    }
+
+    GLint getRessourcesIndex(GLenum glInterface, const std::string& name) const
+    {
+        return getRessourcesIndex(glInterface, name.c_str());
+    }
+
+    GLint getRessourcesIndex(GLenum glInterface, const char* name) const;
+
     // Functions
     bool attach(std::initializer_list<std::reference_wrapper<const Shader>> shaders);       // initializer_list can't contain ref, so we use reference_wrapper (see doc for both)
 
@@ -50,9 +84,11 @@ public:
 
     bool link();
 
+    void use() const;
+
 private:
     GLuint              id;
-    std::vector<GLuint> attachedList; // TODO rework it, use for the detach
+    std::vector<GLuint> attachedList; // TODO rework it, use for the detach shader
 
     bool checkLinkError();
 

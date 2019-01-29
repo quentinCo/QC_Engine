@@ -40,6 +40,18 @@ Program& Program::operator= (Program&& r)
     return *this;
 }
 
+/*-------------------- BUFFEROBJECT GETTERS ---------------------------------*/
+
+GLint Program::getUniformLocation(const char* name) const
+{
+    return glGetUniformLocation(this->id, name);
+}
+
+GLint Program::getRessourcesIndex(GLenum glInterface, const char* name) const
+{
+    return glGetProgramResourceIndex(this->id, glInterface, name);
+}
+
 /*-------------------- BUFFEROBJECT FUNCTIONS ---------------------------------*/
 bool Program::attach(std::initializer_list<std::reference_wrapper<const Shader>> shaders)
 {
@@ -90,6 +102,11 @@ bool Program::link()
         glDetachShader(this->id, it);
 
     return success;
+}
+
+void Program::use() const
+{
+    glUseProgram(this->id);
 }
 
 
