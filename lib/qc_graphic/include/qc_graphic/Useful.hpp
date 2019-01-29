@@ -14,6 +14,12 @@ public:
         std::cerr << "\033[1;38;2;255;57;31mERROR:\033[0m " << description << std::endl;
     }
 
+    template<typename H, typename T>
+    static void PrintError(H header, T description)
+    {
+        std::cerr << "\033[1;38;2;255;57;31mERROR:\033[0m " << "[ " << header << " ] - "<< description << std::endl;
+    }
+
     template<typename T>
     static void PrintSucced(T description, unsigned int level = 0)
     {
