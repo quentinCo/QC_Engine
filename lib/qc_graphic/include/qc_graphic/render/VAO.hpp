@@ -56,10 +56,11 @@ public:
     // Methods
     void allocate();                                                                // create the buffer and save pointer value in pointer attribute 
     void link(const buffer::VBO& vbo, const buffer::IBO& ibo);                      // link VAO with VBO and IBO (save pointer to both object)
-    bool bind();                                                                    // bind VAO, if VAO not correctly init return false
+    bool bind() const;                                                              // bind VAO, if VAO not correctly init return false
+    void unbind() const;                                                              // unbind VAO
 
-    bool isAllocated();
-    bool isUsebable();                                                              // return true if VAO is allocated and linked
+    bool isAllocated() const;
+    bool isUsebable() const;                                                        // return true if VAO is allocated and linked
 
 private:
     GLuint              pointer;

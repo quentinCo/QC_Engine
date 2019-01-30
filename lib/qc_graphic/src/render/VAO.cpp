@@ -81,7 +81,7 @@ void VAO::link(const buffer::VBO& vbo, const buffer::IBO& ibo)
     this->ibo = &ibo;
 }
 
-bool VAO::bind()
+bool VAO::bind() const
 {
     if (this->isUsebable() == false)
         return false;
@@ -90,12 +90,17 @@ bool VAO::bind()
     return true;
 }
 
-bool VAO::isAllocated()
+void VAO::unbind() const
+{
+    glBindVertexArray(0);
+}
+
+bool VAO::isAllocated() const
 {
     return this->pointer != 0;
 }
 
-bool VAO::isUsebable()
+bool VAO::isUsebable() const
 {
     return (this->pointer != 0 && this->vbo != nullptr && this->ibo != nullptr);
 }
