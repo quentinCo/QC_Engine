@@ -14,7 +14,7 @@ struct Vertex
     // Constructors
     Vertex() : position(0), normal(0), uv(0) {}
 
-    Vertex(const glm::vec4& position, const glm::vec4& normal, const glm::vec2& uv)
+    Vertex(const glm::vec4& position, const glm::vec4& normal, const glm::vec2& uv = glm::vec2(0))
         : position(position), normal(normal), uv(uv)
     {}
 
