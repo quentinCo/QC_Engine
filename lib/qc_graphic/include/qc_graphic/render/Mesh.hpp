@@ -15,6 +15,8 @@ class Mesh
 {
 public:
     // Constructor - destructor
+    Mesh() = default;
+
     Mesh(const Vertex* vertices, size_t nbVerticies, const unsigned int* indices, size_t nbIndices)
     {
         this->vertices = std::vector<Vertex>(vertices, vertices + nbVerticies);
@@ -50,6 +52,10 @@ public:
         return this->vao.getPointer();
     }
 
+    GLsizei getNbIndices() const
+    {
+        return static_cast<GLsizei>(this->indices.size());
+    }
 
 private:
     std::vector<Vertex>         vertices;
