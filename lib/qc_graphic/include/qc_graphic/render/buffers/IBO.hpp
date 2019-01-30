@@ -15,7 +15,7 @@ class IBO : public BufferObject<unsigned int>
 {
 public :
     // Constructor - destructor
-    IBO() {}                                                            // init pointeur to 0
+    IBO() = default;                                                    // init pointeur to 0
 
     IBO(const unsigned int* data, unsigned int size);                   // allocate and populate buffer
     IBO(const std::vector<unsigned int>& data);                         // --
@@ -24,7 +24,7 @@ public :
 
     IBO(IBO&& r) = default;
 
-    ~IBO() {}                                                           // free the pointer
+    ~IBO() = default;                                                   // free the pointer
 
     // Operators
     IBO& operator= (const IBO& o) = delete;                             // NO COPY

@@ -16,7 +16,7 @@ class VBO : public BufferObject<qc::render::Vertex>
 {
 public :
     // Constructor - destructor
-    VBO() {}                         // init pointeur to 0
+    VBO() = default;
 
     VBO(const qc::render::Vertex* data, unsigned int size);                 // allocate and populate buffer
     VBO(const std::vector<qc::render::Vertex>& data);                       // --
@@ -25,7 +25,7 @@ public :
 
     VBO(VBO&& r) = default;
 
-    ~VBO() {}                                                               // free the pointer
+    ~VBO() = default;
 
     // Operators
     VBO& operator= (const VBO& o) = delete;                                 // NO COPY
