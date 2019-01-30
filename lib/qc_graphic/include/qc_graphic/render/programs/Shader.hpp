@@ -68,7 +68,7 @@ private:
 
 
     #if _DEBUG
-        int debugId;
+        unsigned int debugId = 0;
 
         void printShaderInFile(bool hasError = false);
     #endif

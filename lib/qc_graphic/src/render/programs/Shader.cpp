@@ -149,12 +149,12 @@ bool Shader::checkCompilationError()
                 std::string shaderType;
                 GetShaderTypeName(this->type, shaderType);
 
-                std::string fileName;
+                std::string fileName = ".\\output_shader\\";
                 if (hasError)
                     fileName += "ERROR_";
                 fileName += shaderType;
                 fileName += "_";
-                fileName += std::to_string(this->debugId);
+                fileName += std::to_string(this->debugId++);
                 fileName += ".glsl";
         
                 std::ofstream outfile(fileName);
