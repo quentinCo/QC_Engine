@@ -1,5 +1,7 @@
 #include <qc_graphic\Transform.hpp>
 
+#include <iostream>
+
 #include <glm\trigonometric.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -48,6 +50,30 @@ const glm::mat4& Transform::getMatrix()
         this->computeMatrix();
 
     return this->matrix;
+}
+
+const glm::mat4& Transform::getPositionMatrix()
+{
+    if (this->isValidMatrix == false)
+        this->computeMatrix();
+
+    return this->positionMatrix;
+}
+
+const glm::mat4& Transform::getRotateMatrix()
+{
+    if (this->isValidMatrix == false)
+        this->computeMatrix();
+
+    return this->rotateMatrix;
+}
+
+const glm::mat4& Transform::getScalingMatrix()
+{
+    if (this->isValidMatrix == false)
+        this->computeMatrix();
+
+    return this->scalingMatrix;
 }
 
 /*-------------------- TRANSFOM FUNCTIONS ---------------------------------*/
@@ -103,12 +129,12 @@ void Transform::scale(float scaling)
  // ------------------------------------------------------------------------------------------------------------------------------------
 void Transform::computeMatrix()
 {
-    glm::mat4 mTranslation  = glm::mat4();
-    glm::mat4 mRotation     = glm::mat4();
-    glm::mat4 mScale        = glm::mat4();
+    this->positionMatrix    = glm::mat4();
+    this->rotateMatrix     = glm::mat4();
+    this->scalingMatrix     = glm::mat4();
 
     // Translate
-    mTranslation[3] = this->position;
+    this->positionMatrix[3] = this->position;
 
     // Rotation
     glm::vec3 cos;
@@ -121,24 +147,28 @@ void Transform::computeMatrix()
     sin.y = glm::sin(this->orientation.y);
     sin.z = glm::sin(this->orientation.z);
 
-    mRotation[0][0] = cos.z * cos.y - sin.z * sin.x * sin.y;
-    mRotation[0][1] = sin.z * cos.y + cos.z * sin.x * sin.y;
-    mRotation[0][2] = -1 * cos.x * sin.y;
+    this->rotateMatrix[0][0] = cos.z * cos.y - sin.z * sin.x * sin.y;
+    this->rotateMatrix[0][1] = sin.z * cos.y + cos.z * sin.x * sin.y;
+    this->rotateMatrix[0][2] = -1 * cos.x * sin.y;
 
-    mRotation[1][0] = -1 * sin.z * cos.x;
-    mRotation[1][1] = cos.z * cos.x;
-    mRotation[1][2] = sin.x;
+    this->rotateMatrix[1][0] = -1 * sin.z * cos.x;
+    this->rotateMatrix[1][1] = cos.z * cos.x;
+    this->rotateMatrix[1][2] = sin.x;
 
-    mRotation[2][0] = cos.z * sin.y - sin.z * sin.x * cos.y;
-    mRotation[2][1] = sin.z * sin.y + cos.z * sin.x * cos.y;
-    mRotation[2][2] = -1 * cos.x * cos.y;
+    this->rotateMatrix[2][0] = cos.z * sin.y - sin.z * sin.x * cos.y;
+    this->rotateMatrix[2][1] = sin.z * sin.y + cos.z * sin.x * cos.y;
+    this->rotateMatrix[2][2] = cos.x * cos.y;
 
     // Scale
-    mScale[0][0] = this->scaling.x;
-    mScale[1][1] = this->scaling.y;
-    mScale[2][2] = this->scaling.z;
+    this->scalingMatrix[0][0] = this->scaling.x;
+    this->scalingMatrix[1][1] = this->scaling.y;
+    this->scalingMatrix[2][2] = this->scaling.z;
 
-    this->matrix = mTranslation * mRotation * mTranslation;
-
+    this->matrix = this->positionMatrix * this->rotateMatrix * this->scalingMatrix;
+    /*
+    this->matrix = glm::mat4();
+    glm::vec3 pos = this->position;
+    this->matrix = glm::translate(this->matrix, pos);
+    */
     this->isValidMatrix = true;
 }

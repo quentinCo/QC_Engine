@@ -11,7 +11,7 @@ class Transform
 {
 public:
     // Constructors
-    Transform(const glm::vec3& position = glm::vec3(0), const glm::vec3& rotation = glm::vec3(0), const glm::vec3& scale = glm::vec3(0));
+    Transform(const glm::vec3& position = glm::vec3(0), const glm::vec3& rotation = glm::vec3(0), const glm::vec3& scale = glm::vec3(1));
     
     ~Transform() {}
 
@@ -40,6 +40,9 @@ public:
     void setScale(const glm::vec3& scale);
 
     const glm::mat4& getMatrix();
+    const glm::mat4& getPositionMatrix();
+    const glm::mat4& getRotateMatrix();
+    const glm::mat4& getScalingMatrix();
 
     // Function
     void translate(const glm::vec3& translation);   // Add translation to this->position
@@ -58,6 +61,9 @@ private:
     glm::vec3   scaling;
 
     glm::mat4   matrix;                             // Matrix of all transformations
+    glm::mat4   positionMatrix;
+    glm::mat4   rotateMatrix;
+    glm::mat4   scalingMatrix;
 
     bool        isValidMatrix;
 
