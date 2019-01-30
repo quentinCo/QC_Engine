@@ -1,5 +1,6 @@
 #include <Application.hpp>
 
+// Native C++
 #include <iostream>
 
 #include <memory>
@@ -7,10 +8,16 @@
 #include <string>
 #include <chrono>
 
+// Qc_graphic
 #include <qc_graphic\Window.hpp>
 #include <qc_graphic\Useful.hpp>
 #include <qc_graphic\render\Camera.hpp>
 #include <qc_graphic\controler\FPSCameraController.hpp>
+
+#include <qc_graphic\render\programs\Program.hpp>
+
+// Application
+#include <instances\Object3d.hpp>
 
 static qc::Window window;
 static qc::render::Camera camera;
