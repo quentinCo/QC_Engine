@@ -3,6 +3,8 @@
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
 
+#include <glm\vec2.hpp>
+
 #include <string>
 #include <chrono>
 
@@ -20,6 +22,9 @@ public:
 
     // Getters / Setters
     GLFWwindow* getGLFWwindow() const;
+    int         getWidth() const;
+    int         getHeight() const;
+    glm::ivec2  getViewportSize() const;
     bool        getShouldClose() const;
     float       getFrameDuration() const;
     float       getFrameDurationSecond() const;

@@ -50,6 +50,21 @@ GLFWwindow* Window::getGLFWwindow() const
     return this->glwfWindow;
 }
 
+int Window::getWidth() const
+{
+    return this->width;
+}
+
+int Window::getHeight() const
+{
+    return this->height;
+}
+
+glm::ivec2 Window::getViewportSize() const
+{
+    return glm::ivec2(this->width, this->height);
+}
+
 bool Window::getShouldClose() const
 {
     return this->shouldClose;
