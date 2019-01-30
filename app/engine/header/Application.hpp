@@ -1,9 +1,6 @@
 #pragma once
 
-// Temp
-#include <glm/matrix.hpp>
-#include <vector>
-#include <ctime>
+#include <qc_graphic\Window.hpp>
 
 class Application
 {
@@ -18,10 +15,9 @@ public:
 	*/
     int run();
 
-	static bool waitKey();
-
 private:
 	//-- Window
+    qc::Window  window;
 
 	//-- Struct
 

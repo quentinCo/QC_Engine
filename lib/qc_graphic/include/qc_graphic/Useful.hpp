@@ -17,7 +17,7 @@ public:
     template<typename H, typename T>
     static void PrintError(H header, T description)
     {
-        std::cerr << "\033[1;38;2;255;57;31mERROR:\033[0m " << "[ " << header << " ] - "<< description << std::endl;
+        std::cerr << "\033[1;38;2;255;57;31mERROR:\033[0m " << "[ " << header << " ]\033[1;38;2;255;57;31m - \033[0m"<< description << std::endl;
     }
 
     template<typename T>

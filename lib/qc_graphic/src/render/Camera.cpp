@@ -2,6 +2,8 @@
 //#define NOMINMAX
 #include <cmath>
 
+#include <iostream>
+
 #include <glm\gtc\matrix_transform.hpp>
 
 #include <qc_graphic\render\Camera.hpp>
