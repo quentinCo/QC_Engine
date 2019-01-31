@@ -155,8 +155,8 @@ void Transform::computeMatrix()
     this->rotateMatrix[1][1] = cos.z * cos.x;
     this->rotateMatrix[1][2] = sin.x;
 
-    this->rotateMatrix[2][0] = cos.z * sin.y - sin.z * sin.x * cos.y;
-    this->rotateMatrix[2][1] = sin.z * sin.y + cos.z * sin.x * cos.y;
+    this->rotateMatrix[2][0] = cos.z * sin.y + sin.z * sin.x * cos.y;
+    this->rotateMatrix[2][1] = sin.z * sin.y - cos.z * sin.x * cos.y;
     this->rotateMatrix[2][2] = cos.x * cos.y;
 
     // Scale
