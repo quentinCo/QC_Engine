@@ -66,7 +66,7 @@ int Application::run()
         return 0;
 
         // Init Camera
-    fpsCameraController = qc::controller::FPSCameraController(window, camera);
+    fpsCameraController = qc::controller::FPSCameraController(window, camera, 10, 0.05);
     cameraController = &fpsCameraController;
 
         //Init Program
@@ -98,11 +98,11 @@ int Application::run()
     {
         this->window.update();
 
-        //cameraController->update();
+        cameraController->update();
 
         renderScene(objects, viewportSize, defaultProgram);
 
-
+        /*
         for (auto& obj : objects)
         {
             auto& trans = obj.getTransformation();
@@ -111,7 +111,7 @@ int Application::run()
             const float angleZ = 0;// 1 / 400.f;
             trans.rotate(glm::vec3(angleX, angleY, angleZ));
         }
-
+        */
     }
 
     return 0;
@@ -144,32 +144,32 @@ static std::unique_ptr<qc::render::Mesh> makeCube()
 
 
     vertices = {
-        qc::render::Vertex(points[0], glm::vec4(1,0,0,0)),
-        qc::render::Vertex(points[1], glm::vec4(1,0,0,0)),
-        qc::render::Vertex(points[2], glm::vec4(1,0,0,0)),
-        qc::render::Vertex(points[3], glm::vec4(1,0,0,0)),
-        qc::render::Vertex(points[4], glm::vec4(-1,0,0,0)),
-        qc::render::Vertex(points[5], glm::vec4(-1,0,0,0)),
-        qc::render::Vertex(points[6], glm::vec4(-1,0,0,0)),
-        qc::render::Vertex(points[7], glm::vec4(-1,0,0,0)),
+        qc::render::Vertex(points[0], glm::vec4(1,0,0,0), glm::vec2(1,0)),
+        qc::render::Vertex(points[1], glm::vec4(1,0,0,0), glm::vec2(0,0)),
+        qc::render::Vertex(points[2], glm::vec4(1,0,0,0), glm::vec2(1,1)),
+        qc::render::Vertex(points[3], glm::vec4(1,0,0,0), glm::vec2(0,1)),
+        qc::render::Vertex(points[4], glm::vec4(-1,0,0,0), glm::vec2(0,1)),
+        qc::render::Vertex(points[5], glm::vec4(-1,0,0,0), glm::vec2(1,1)),
+        qc::render::Vertex(points[6], glm::vec4(-1,0,0,0), glm::vec2(0,0)),
+        qc::render::Vertex(points[7], glm::vec4(-1,0,0,0), glm::vec2(1,0)),
 
-        qc::render::Vertex(points[0], glm::vec4(0,0,1,0)),
-        qc::render::Vertex(points[1], glm::vec4(0,0,1,0)),
-        qc::render::Vertex(points[7], glm::vec4(0,0,1,0)),
-        qc::render::Vertex(points[6], glm::vec4(0,0,1,0)),
-        qc::render::Vertex(points[2], glm::vec4(0,0,-1,0)),
-        qc::render::Vertex(points[3], glm::vec4(0,0,-1,0)),
-        qc::render::Vertex(points[5], glm::vec4(0,0,-1,0)),
-        qc::render::Vertex(points[4], glm::vec4(0,0,-1,0)),
+        qc::render::Vertex(points[0], glm::vec4(0,0,1,0), glm::vec2(0,1)),
+        qc::render::Vertex(points[1], glm::vec4(0,0,1,0), glm::vec2(0,0)),
+        qc::render::Vertex(points[7], glm::vec4(0,0,1,0), glm::vec2(1,0)),
+        qc::render::Vertex(points[6], glm::vec4(0,0,1,0), glm::vec2(1,1)),
+        qc::render::Vertex(points[2], glm::vec4(0,0,-1,0), glm::vec2(0,0)),
+        qc::render::Vertex(points[3], glm::vec4(0,0,-1,0), glm::vec2(0,1)),
+        qc::render::Vertex(points[5], glm::vec4(0,0,-1,0), glm::vec2(1,1)),
+        qc::render::Vertex(points[4], glm::vec4(0,0,-1,0), glm::vec2(1,0)),
 
-        qc::render::Vertex(points[0], glm::vec4(0,1,0,0)),
-        qc::render::Vertex(points[2], glm::vec4(0,1,0,0)),
-        qc::render::Vertex(points[4], glm::vec4(0,1,0,0)),
-        qc::render::Vertex(points[6], glm::vec4(0,1,0,0)),
-        qc::render::Vertex(points[1], glm::vec4(0,-1,0,0)),
-        qc::render::Vertex(points[3], glm::vec4(0,-1,0,0)),
-        qc::render::Vertex(points[5], glm::vec4(0,-1,0,0)),
-        qc::render::Vertex(points[7], glm::vec4(0,-1,0,0))
+        qc::render::Vertex(points[0], glm::vec4(0,1,0,0), glm::vec2(0,0)),
+        qc::render::Vertex(points[2], glm::vec4(0,1,0,0), glm::vec2(0,1)),
+        qc::render::Vertex(points[4], glm::vec4(0,1,0,0), glm::vec2(1,1)),
+        qc::render::Vertex(points[6], glm::vec4(0,1,0,0), glm::vec2(1,0)),
+        qc::render::Vertex(points[1], glm::vec4(0,-1,0,0), glm::vec2(0,1)),
+        qc::render::Vertex(points[3], glm::vec4(0,-1,0,0), glm::vec2(0,0)),
+        qc::render::Vertex(points[5], glm::vec4(0,-1,0,0), glm::vec2(1,0)),
+        qc::render::Vertex(points[7], glm::vec4(0,-1,0,0), glm::vec2(1,1))
     };
 
     indices = {
@@ -185,8 +185,8 @@ static std::unique_ptr<qc::render::Mesh> makeCube()
 
         16, 17, 18,
         16, 18, 19,
-        20, 21, 22,
-        20, 22, 23
+        20, 22, 21,
+        20, 23, 22
     };
 
     return std::unique_ptr<qc::render::Mesh>(new qc::render::Mesh(vertices, indices));
@@ -198,14 +198,21 @@ static bool generateDefaultVertexShader(qc::render::program::Shader& vs)
     std::string vertexShaderSrc =
 R"(
 	#version 430
+
 	layout(location = 0) in vec4 aPosition;
     layout(location = 1) in vec4 aNormal; 
+    layout(location = 2) in vec2 aTexCoord; 
+
 	uniform mat4 uMVPMatrix;
     uniform mat4 uNormalMatrix;
+
     out vec4 vNormal;
+    out vec2 vTexCoord;
+
 	void main()
 	{
         vNormal = uNormalMatrix * aNormal;
+        vTexCoord = aTexCoord;
         gl_Position = uMVPMatrix * aPosition;
 	}
 )";
@@ -219,15 +226,43 @@ static bool generateDefaultFragmentShader(qc::render::program::Shader& fs)
     std::string fragmentShaderSrc =
 R"(
     #version 430
-    
+
+    layout(origin_upper_left) in vec4 gl_FragCoord;    
+
     in vec4 vNormal;
+    in vec2 vTexCoord;
+
     out vec4 fColor;
+
+    void checkerboard(in vec2 texCoord, inout vec4 color)
+    {
+        float scale = 3.0;
+        float sum = floor(texCoord.x * scale) + floor(texCoord.y * scale);
+        float modulo = mod(sum, 2); 
+        color =  vec4(color.xyz * modulo, 1);
+    } 
+
     void main()
     {
         vec4 color = vec4(1, 0.5, 0, 1);
-        fColor = dot(vNormal, vec4(0,1,0,0)) * color;
-        fColor = vNormal;
+        vec4 dir = normalize(vec4(0.25,0.25,0.75,0));
+        //fColor = dot(vNormal, dir) * color;
+        //fColor = vNormal;
         //fColor = vec4(0,1,0, 1);
+
+        //vec2 uv = floor(gl_FragCoord.xy / 60.0);
+        //
+        //if(mod(uv.x + uv.y, 2.0) == 0.0){
+        //    fColor = vec4(0,0,0, 1.0);
+        //}
+        //else{
+        //    fColor = vec4(1,1,1, 1.0);
+        //}
+
+        //fColor = vec4(vTexCoord, 0, 1);
+
+        checkerboard(vTexCoord, color);
+        fColor = dot(vNormal, dir) * color;
     }
 )";
 
