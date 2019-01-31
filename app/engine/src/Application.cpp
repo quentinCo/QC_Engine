@@ -36,9 +36,9 @@ static GLuint uNormalMatrix;
 
 /*-------------------- TEST FUNCTIONS PROTOTYPE ----------------------------------*/
 static std::unique_ptr<qc::render::Mesh> makeCube();
-static bool generateDefaultVertexShader(qc::render::program::Shader& vs);
-static bool generateDefaultFragmentShader(qc::render::program::Shader& fs);
-static bool makeDefaultProgram(qc::render::program::Program& program);
+static bool generateTestVertexShader(qc::render::program::Shader& vs);
+static bool generateTestFragmentShader(qc::render::program::Shader& fs);
+static bool makeTestProgram(qc::render::program::Program& program);
 
 static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& viewportSize, const qc::render::program::Program& prog);
 
@@ -66,17 +66,11 @@ int Application::run()
         return 0;
 
         // Init Camera
-    fpsCameraController = qc::controller::FPSCameraController(window, camera, 10, 0.05);
+    fpsCameraController = qc::controller::FPSCameraController(window, camera, 10, 0.05f);
     cameraController = &fpsCameraController;
 
         //Init Program
-    qc::render::program::Program defaultProgram;
-    isInit = makeDefaultProgram(defaultProgram);
-    if (isInit == false)
-    {
-        qc::Useful::PrintError("default program failed to init");
-        return 0;
-    }
+    qc::render::program::Program defaultProgram = qc::render::program::GetDefaultProgram();
 
         // Init Uniform
     uMVPMatrix = defaultProgram.getUniformLocation("uMVPMatrix");
@@ -90,6 +84,12 @@ int Application::run()
     std::vector<app::Object3d> objects;
     objects.emplace_back(cube.get());
 
+    {
+        auto& obj = objects.back();
+        auto& trans = obj.getTransformation();
+        trans.translate({ 0,0,-2 });
+    }
+
     // Save viewport size
     glm::ivec2 viewportSize = window.getViewportSize(); // CAUTION: Valid because the viewport is unsizeable
 
@@ -102,16 +102,14 @@ int Application::run()
 
         renderScene(objects, viewportSize, defaultProgram);
 
-        /*
         for (auto& obj : objects)
         {
             auto& trans = obj.getTransformation();
-            const float angleX = 0;// 1 / 100.f;
+            const float angleX = 1 / 100.f;
             const float angleY = 1 / 200.f;
-            const float angleZ = 0;// 1 / 400.f;
+            const float angleZ = 1 / 400.f;
             trans.rotate(glm::vec3(angleX, angleY, angleZ));
         }
-        */
     }
 
     return 0;
@@ -193,7 +191,7 @@ static std::unique_ptr<qc::render::Mesh> makeCube()
 }
 
 
-static bool generateDefaultVertexShader(qc::render::program::Shader& vs)
+static bool generateTestVertexShader(qc::render::program::Shader& vs)
 {
     std::string vertexShaderSrc =
 R"(
@@ -221,7 +219,7 @@ R"(
     return vs.compile();
 }
 
-static bool generateDefaultFragmentShader(qc::render::program::Shader& fs)
+static bool generateTestFragmentShader(qc::render::program::Shader& fs)
 {
     std::string fragmentShaderSrc =
 R"(
@@ -270,18 +268,18 @@ R"(
     return fs.compile();
 }
 
-static bool makeDefaultProgram(qc::render::program::Program& program)
+static bool makeTestProgram(qc::render::program::Program& program)
 {
     qc::render::program::Shader vs = qc::render::program::Shader(qc::render::program::ShaderType::VERTEX_SHADER);
     qc::render::program::Shader fs = qc::render::program::Shader(qc::render::program::ShaderType::FRAGMENT_SHADER);
 
     bool res = false;
 
-    res = generateDefaultVertexShader(vs);
+    res = generateTestVertexShader(vs);
     if (!res)
         return res;
 
-    res = generateDefaultFragmentShader(fs);
+    res = generateTestFragmentShader(fs);
     if (!res)
         return res;
 

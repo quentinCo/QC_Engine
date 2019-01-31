@@ -17,9 +17,8 @@ FPSCameraController::FPSCameraController(Window& window, render::Camera& cam, fl
     : window(&window), camera(&cam), linearSpeed(linearSpeed), rotationSpeed(rotationSpeed), cursorPosition(0)
 {
     GLFWwindow* glfwWindow = this->window->getGLFWwindow();
-    assert(glfwWindow);
-
-    glfwGetCursorPos(glfwWindow, &this->cursorPosition.x, &this->cursorPosition.y);
+    if(glfwWindow)
+        glfwGetCursorPos(glfwWindow, &this->cursorPosition.x, &this->cursorPosition.y);
 }
 
 void FPSCameraController::setCamera(render::Camera& cam)

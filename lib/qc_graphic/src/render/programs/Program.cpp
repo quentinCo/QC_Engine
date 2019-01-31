@@ -144,3 +144,121 @@ bool Program::checkLinkError()
 
     return true;
 }
+
+
+
+
+/*
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+ // GLOBAL USEFUL METHODS --------------------------------------------------------------------------------------------------------------
+ // ------------------------------------------------------------------------------------------------------------------------------------
+
+namespace qc
+{
+
+namespace render
+{
+
+namespace program
+{
+
+
+
+    static bool generateDefaultVertexShader(Shader& vs);
+    static bool generateDefaultFragmentShader(Shader& fs);
+    static bool makeDefaultProgram(Program& program);
+
+    extern Program GetDefaultProgram()
+    {
+        Program defaultProgram;
+        makeDefaultProgram(defaultProgram);
+        return defaultProgram;
+    }
+
+    static bool generateDefaultVertexShader(Shader& vs)
+    {
+        std::string vertexShaderSrc =
+            R"(
+#version 430
+
+layout(location = 0) in vec4 aPosition;
+layout(location = 1) in vec4 aNormal; 
+layout(location = 2) in vec2 aTexCoord; 
+
+uniform mat4 uMVPMatrix;
+uniform mat4 uNormalMatrix;
+
+out vec4 vNormal;
+out vec2 vTexCoord;
+
+void main()
+{
+vNormal = uNormalMatrix * aNormal;
+vTexCoord = aTexCoord;
+gl_Position = uMVPMatrix * aPosition;
+}
+)";
+
+        vs.appendCode(vertexShaderSrc);
+        return vs.compile();
+    }
+
+    static bool generateDefaultFragmentShader(Shader& fs)
+    {
+        std::string fragmentShaderSrc =
+            R"(
+#version 430
+
+layout(origin_upper_left) in vec4 gl_FragCoord;    
+
+in vec4 vNormal;
+in vec2 vTexCoord;
+
+out vec4 fColor;
+
+void checkerboard(in vec2 texCoord, inout vec4 color)
+{
+float scale = 3.0;
+float sum = floor(texCoord.x * scale) + floor(texCoord.y * scale);
+float modulo = mod(sum, 2); 
+color =  vec4(color.xyz * modulo, 1);
+} 
+
+void main()
+{
+vec4 color = vec4(1, 0.5, 0, 1);
+vec4 dir = normalize(vec4(0.25,0.25,0.75,0));
+
+checkerboard(vTexCoord, color);
+fColor = dot(vNormal, dir) * color;
+}
+)";
+
+        fs.appendCode(fragmentShaderSrc);
+        return fs.compile();
+    }
+
+    static bool makeDefaultProgram(Program& program)
+    {
+        Shader vs = Shader(ShaderType::VERTEX_SHADER);
+        Shader fs = Shader(ShaderType::FRAGMENT_SHADER);
+
+        generateDefaultVertexShader(vs);
+        generateDefaultFragmentShader(fs);
+        program.attach({ vs, fs });
+
+        return program.link();
+    }
+
+}   //! program
+
+}   //! render
+
+}   //! qc

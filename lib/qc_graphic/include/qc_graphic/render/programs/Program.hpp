@@ -41,6 +41,11 @@ public:
         return this->id;
     }
 
+    size_t getNbAttached()
+    {
+        return this->attachedList.size();
+    }
+
     GLint getUniformLocation(const std::string& name) const
     {
         return getUniformLocation(name.c_str());
@@ -94,8 +99,10 @@ private:
 
 };
 
-}
+extern Program GetDefaultProgram();
 
-}
+}   //! program
 
-}
+}   //! render
+
+}   //! qc
