@@ -110,7 +110,7 @@ void FPSCameraController::updateTranslation()
         translation -= this->linearSpeed * frameDuration * rightVector;
     }
 
-    if (glfwGetKey(glfwWindow, GLFW_KEY_W) == GLFW_PRESS)
+    if (glfwGetKey(glfwWindow, GLFW_KEY_D) == GLFW_PRESS)
     {
         translation += this->linearSpeed * frameDuration * rightVector;
     }
