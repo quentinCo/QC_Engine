@@ -16,7 +16,7 @@ class Window
 public:
     // Constructors
     Window();
-    Window(int width, int height, const std::string& name);
+    Window(int width, int height, const std::string& name, int quitKey = GLFW_KEY_ESCAPE);
 
     ~Window();
 
@@ -48,6 +48,8 @@ private:
     int             height;
     std::string     name;
     
+    int             quitKey;
+
     // Events
     bool            shouldClose;
 

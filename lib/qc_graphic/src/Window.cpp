@@ -30,8 +30,8 @@ Window::Window()
     : Window(0, 0, "No Name")
 {}
 
-Window::Window(int width, int height, const std::string& name)
-    : glwfWindow(nullptr), width(width), height(height), name(name), shouldClose(false),
+Window::Window(int width, int height, const std::string& name, int quitKey)
+    : glwfWindow(nullptr), width(width), height(height), name(name), shouldClose(false), quitKey(quitKey),
         frameDuration(0), fps(0)
 {}
 
@@ -230,6 +230,11 @@ void Window::update()
     glfwPollEvents();
 
     this->shouldClose = glfwWindowShouldClose(this->glwfWindow);
+
+    if (glfwGetKey(this->glwfWindow, this->quitKey) == GLFW_PRESS)
+    {
+        this->shouldClose = true;
+    }
 
     // Time datas
     auto currentClock = std::chrono::system_clock::now();
