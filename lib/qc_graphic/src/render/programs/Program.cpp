@@ -44,12 +44,34 @@ Program& Program::operator= (Program&& r)
 
 GLint Program::getUniformLocation(const char* name) const
 {
-    return glGetUniformLocation(this->id, name);
+    GLint location = glGetUniformLocation(this->id, name);
+
+    if (location == -1)
+    {
+        std::string err = "Uniform named: ";
+        err += name;
+        //err += " seem to doesn't exist. (\"";
+        //err += name;
+        //err += "\" can exist, but discard at compilation because you don't use it)";
+        err += " seem to doesn't exist. (It can exist, but discard at compilation because you don't use it)";
+        qc::Useful::PrintError("UNIFORM LOCATION", err);
+    }
+
+    return location;
 }
 
 GLint Program::getRessourcesIndex(GLenum glInterface, const char* name) const
 {
-    return glGetProgramResourceIndex(this->id, glInterface, name);
+    GLint index = glGetProgramResourceIndex(this->id, glInterface, name);
+    if (index == -1)
+    {
+        std::string err = "Ressource named: ";
+        err += name;
+        err += " seem to doesn't exist";
+        qc::Useful::PrintError("RESSOURCES INDEX", err);
+    }
+
+    return index;
 }
 
 /*-------------------- PROGRAM FUNCTIONS ---------------------------------*/
