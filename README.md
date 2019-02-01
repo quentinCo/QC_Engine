@@ -6,13 +6,13 @@ QC Engine is a personal challenge which has for objective to develop a real time
 
 ### A generic library - in process
 
-	The first objective of this project is to develop a library which provides the basic elements to enable quick implementation of new rendering method.
-	- Window management
-	- Cameras
-	- OpenGL encapsulation
-	- Mesh generation
-	- 3d file importer
-	- ...
+The first objective of this project is to develop a library which provides the basic elements to enable quick implementation of new rendering method.
+- Window management
+- Cameras
+- OpenGL encapsulation
+- Mesh generation
+- 3d file importer
+- ...
 [//]: # (Currently implemented:) 
 [//]: # (- Basic opengl objects) 
 [//]: # (		- Buffer Objects) 
@@ -26,11 +26,11 @@ QC Engine is a personal challenge which has for objective to develop a real time
 	
 ### The engine - coming
 
-	The second objective is the realisation of the engine itself.
-	- Scene graph
-	- Multimaterial
-	- Rendering options with various optimisation (culling methods, tessellation, ...)
-	- ...
+The second objective is the realisation of the engine itself.
+- Scene graph
+- Multimaterial
+- Rendering options with various optimisation (culling methods, tessellation, ...)
+- ...
 
 ## Compilation instruction
 Execute the cmake to generate the project.
