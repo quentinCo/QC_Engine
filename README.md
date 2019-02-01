@@ -13,6 +13,7 @@ The first objective of this project is to develop a library which provides the b
 - Mesh generation
 - 3d file importer
 - ...
+
 [//]: # (Currently implemented:) 
 [//]: # (- Basic opengl objects) 
 [//]: # (		- Buffer Objects) 
