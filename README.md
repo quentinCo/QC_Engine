@@ -13,16 +13,16 @@ QC Engine is a personal challenge which has for objective to develop a real time
 	- Mesh generation
 	- 3d file importer
 	- ...
-[comment]: <> (Currently implemented:) 
-[comment]: <> (- Basic opengl objects) 
-[comment]: <> (		- Buffer Objects) 
-[comment]: <> (		- Vertex Array)
-[comment]: <> (		- Shader)
-[comment]: <> (		- Program)
-[comment]: <> (- Window)
-[comment]: <> (- Basic camera)
-[comment]: <> (- Camera controlers - FPS)
-[comment]: <> (- Transform)
+[//]: # (Currently implemented:) 
+[//]: # (- Basic opengl objects) 
+[//]: # (		- Buffer Objects) 
+[//]: # (		- Vertex Array)
+[//]: # (		- Shader)
+[//]: # (		- Program)
+[//]: # (- Window)
+[//]: # (- Basic camera)
+[//]: # (- Camera controlers - FPS)
+[//]: # (- Transform)
 	
 ### The engine - coming
 
