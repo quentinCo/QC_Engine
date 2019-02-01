@@ -21,6 +21,7 @@
 
 // Application
 #include <instances\Object3d.hpp>
+#include <instances\PointLightInstance.hpp>
 
 /*-------------------- TEMPORARY TEST VARIABLES ----------------------------------*/
 // TODO move camera manage in a app::Camera object
@@ -30,8 +31,16 @@ static qc::controller::FPSCameraController fpsCameraController;
 
 static std::vector<std::unique_ptr<qc::render::Mesh>> meshCollection;
 
+static app::PointLightInstance pointLight;
+
 static GLuint uMVPMatrix;
 static GLuint uNormalMatrix;
+static GLuint uViewMatrix;
+static GLuint uMVMatrix;
+
+static GLuint uPointLightPos;
+static GLuint uPointLightCol;
+static GLuint uPointLightInt;
 
 
 /*-------------------- TEST FUNCTIONS PROTOTYPE ----------------------------------*/
@@ -70,11 +79,18 @@ int Application::run()
     cameraController = &fpsCameraController;
 
         //Init Program
-    qc::render::program::Program defaultProgram = qc::render::program::GetDefaultProgram();
+    //qc::render::program::Program defaultProgram = qc::render::program::GetDefaultProgram();
+    qc::render::program::Program defaultProgram;
+    makeTestProgram(defaultProgram);
 
         // Init Uniform
     uMVPMatrix = defaultProgram.getUniformLocation("uMVPMatrix");
     uNormalMatrix = defaultProgram.getUniformLocation("uNormalMatrix");
+    uViewMatrix = defaultProgram.getUniformLocation("uViewMatrix"); 
+    uMVMatrix = defaultProgram.getUniformLocation("uMVMatrix");
+    uPointLightPos = defaultProgram.getUniformLocation("uPointLight.position");
+    uPointLightCol = defaultProgram.getUniformLocation("uPointLight.color");
+    uPointLightInt = defaultProgram.getUniformLocation("uPointLight.intensity");
 
         // Init Meshs
     meshCollection.emplace_back(makeCube());
@@ -89,6 +105,8 @@ int Application::run()
         auto& trans = obj.getTransformation();
         trans.translate({ 0,0,-2 });
     }
+
+    pointLight = app::PointLightInstance(glm::vec3(0, 5, 5), 10, glm::vec3(0, 1, 0));
 
     // Save viewport size
     glm::ivec2 viewportSize = window.getViewportSize(); // CAUTION: Valid because the viewport is unsizeable
@@ -203,12 +221,16 @@ R"(
 
 	uniform mat4 uMVPMatrix;
     uniform mat4 uNormalMatrix;
+    uniform mat4 uViewMatrix;
+    uniform mat4 uMVMatrix;
 
+    out vec4 vPosition;
     out vec4 vNormal;
     out vec2 vTexCoord;
 
 	void main()
 	{
+        vPosition = uMVMatrix * aPosition;
         vNormal = uNormalMatrix * aNormal;
         vTexCoord = aTexCoord;
         gl_Position = uMVPMatrix * aPosition;
@@ -225,8 +247,19 @@ static bool generateTestFragmentShader(qc::render::program::Shader& fs)
 R"(
     #version 430
 
+    struct PointLight
+    {
+        vec4        position;
+        vec4        color;
+        float       intensity;
+    };
+
     layout(origin_upper_left) in vec4 gl_FragCoord;    
 
+    uniform PointLight uPointLight;
+    uniform mat4 uViewMatrix;
+
+    in vec4 vPosition;
     in vec4 vNormal;
     in vec2 vTexCoord;
 
@@ -242,8 +275,18 @@ R"(
 
     void main()
     {
-        vec4 color = vec4(1, 0.5, 0, 1);
+        // Light
+        vec4 lightPos = uViewMatrix * uPointLight.position;
+        vec4 lightDir = uPointLight.position - vPosition;
+        float fact = max(0, dot(lightDir, vNormal));
+
+        vec4 light = uPointLight.color * fact;
+
+
+        vec4 color = vec4(1);
+
         vec4 dir = normalize(vec4(0.25,0.25,0.75,0));
+
         //fColor = dot(vNormal, dir) * color;
         //fColor = vNormal;
         //fColor = vec4(0,1,0, 1);
@@ -260,7 +303,8 @@ R"(
         //fColor = vec4(vTexCoord, 0, 1);
 
         checkerboard(vTexCoord, color);
-        fColor = dot(vNormal, dir) * color;
+
+        fColor = light * color;
     }
 )";
 
@@ -308,6 +352,7 @@ static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& view
         glm::mat4 normalMatrix  = glm::transpose(glm::inverse(mvMatrix)); // TODO: check the normal must be only affected and so by rotation -> rotateMatrix^-1 = rotateMatrix^T
 
         glUniformMatrix4fv(uMVPMatrix   , 1, GL_FALSE, glm::value_ptr(mvpMatrix));
+        glUniformMatrix4fv(uMVMatrix    , 1, GL_FALSE, glm::value_ptr(mvMatrix));        
         glUniformMatrix4fv(uNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
         const qc::render::Mesh* mesh    = obj.getMesh();
@@ -337,6 +382,16 @@ static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& view
 
     // Use rendering program
     prog.use();
+
+    // Bind general uniform
+    glUniformMatrix4fv(uViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+    auto& light = pointLight.getLight();
+    auto color = light.getColor();
+
+    glUniform4fv(uPointLightPos, 1, glm::value_ptr(light.getPosition()));
+    glUniform4fv(uPointLightCol, 1, glm::value_ptr(light.getColor()));
+    glUniform1f(uPointLightInt,     light.getIntensity());
 
     // Iterate through objects and draw
     for (auto& obj : objs)

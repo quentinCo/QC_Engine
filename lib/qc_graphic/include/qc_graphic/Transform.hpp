@@ -16,14 +16,14 @@ public:
     ~Transform() {}
 
     // Getters - Setters
-    const glm::vec4& getPosition()
+    const glm::vec4& getPosition() const
     {
         return this->position;
     }
 
     void setPosition(const glm::vec3& position);
 
-    const glm::vec3& getOrientation()
+    const glm::vec3& getOrientation() const
     {
         return this->orientation;
     }
@@ -32,7 +32,7 @@ public:
 
     void setOrientationDeg(const glm::vec3& rotation);
 
-    const glm::vec3& getScale()
+    const glm::vec3& getScale() const
     {
         return this->scaling;
     }
@@ -53,6 +53,11 @@ public:
 
     void scale(const glm::vec3& scaling);           // Multiply this->scaling._ by scaling._
     void scale(float scaling);
+
+    bool isValid() const
+    {
+        return this->isValidMatrix;
+    }
 
 
 private:
