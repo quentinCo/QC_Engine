@@ -34,6 +34,7 @@ The second objective is the realisation of the engine itself.
 - ...
 
 ## Compilation instruction
+**The code works with OpenGL 4.5** (use direct state access)
 Execute the cmake to generate the project.
 - [x] Tested on windows (visual studio)
 - [ ] Tested on linux
