@@ -1,6 +1,36 @@
-# Opengl Engine 
+# QC Engine 
 
-## Rendering Methods
+QC Engine is a personal challenge which has for objective to develop a real time rendering engine, and try the latest rendering method.
+
+## Objectives
+
+### A generic library - in process
+
+	The first objective of this project is to develop a library which provides the basic elements to enable quick implementation of new rendering method.
+	- Window management
+	- Cameras
+	- OpenGL encapsulation
+	- Mesh generation
+	- 3d file importer
+	- ...
+[comment]: <> (Currently implemented:) 
+[comment]: <> (- Basic opengl objects) 
+[comment]: <> (		- Buffer Objects) 
+[comment]: <> (		- Vertex Array)
+[comment]: <> (		- Shader)
+[comment]: <> (		- Program)
+[comment]: <> (- Window)
+[comment]: <> (- Basic camera)
+[comment]: <> (- Camera controlers - FPS)
+[comment]: <> (- Transform)
+	
+### The engine - coming
+
+	The second objective is the realisation of the engine itself.
+	- Scene graph
+	- Multimaterial
+	- Rendering options with various optimisation (culling methods, tessellation, ...)
+	- ...
 
 ## Compilation instruction
 Execute the cmake to generate the project.
@@ -10,23 +40,13 @@ Execute the cmake to generate the project.
 
 On visual studio set "engine" as main project.
 
-### Possible problems
-If you have an error at compilation with the include of "experimental/filesystem", it's probably that you don't support the experimental c++ methods. In this case, use the library [Boost](http://www.boost.org/) and reexecute the cmake file with command line below:
-
-	cmake -DGLMLV_USE_BOOST_FILESYSTEM=ON ../opengl_engine/
-
-Or by selecting GLMLV_USE_BOOST_FILESYSTEM, if you use cmake GUI.
-
 ## Directory organisation
 - **/apps/engine**: contains the main application.
-- **/lib**: contains the library "qc". This library contain every source codes and shaders of the graphic and physical engine.
+- **/lib**: contains the library "qc_graphic". This library contains basic objects to create a quick environment (window, camera and opengl objects).
 - **/third-party**:
 	- [glfw](http://www.glfw.org/): window and input gestion (easier than SDL).
 	- [glm](http://glm.g-truc.net/0.9.8/index.html): mathematical library.
 	- [glad](http://glad.dav1d.de/): openGl loader (like GLEW)
-
-### Internal library organisation : qc
-- **qc::graphic**: graphic library
 
 ## Author
 *[Quentin Couillard](http://www.quentincouillard.com/)*
