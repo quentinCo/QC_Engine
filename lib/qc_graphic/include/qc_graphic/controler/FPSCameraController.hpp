@@ -37,12 +37,15 @@ private:
     Window*         window;
     render::Camera* camera;
 
+    bool roolingActive;
+
     float linearSpeed;
     float rotationSpeed;
 
     glm::dvec2 cursorPosition;
 
     // Function
+    void updateOptions();
     void updateTranslation();
     void updateRoation();
 };

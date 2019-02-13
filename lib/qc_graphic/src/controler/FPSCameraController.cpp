@@ -10,24 +10,23 @@ using namespace qc::controller;
 
 /*-------------------- FPSCAMERACONTROLLER CONSTRUCTORS ---------------------------------*/
 FPSCameraController::FPSCameraController()
-    : window(nullptr), camera(nullptr), linearSpeed(0), rotationSpeed(0), cursorPosition(0)
+    : window(nullptr), camera(nullptr), linearSpeed(0), rotationSpeed(0), cursorPosition(0), roolingActive(true)
 {}
 
 FPSCameraController::FPSCameraController(Window& window, render::Camera& cam, float linearSpeed, float rotationSpeed)
-    : window(&window), camera(&cam), linearSpeed(linearSpeed), rotationSpeed(rotationSpeed), cursorPosition(0)
+    : window(&window), camera(&cam), linearSpeed(linearSpeed), rotationSpeed(rotationSpeed), cursorPosition(0), roolingActive(true)
 {
     GLFWwindow* glfwWindow = this->window->getGLFWwindow();
     if(glfwWindow)
         glfwGetCursorPos(glfwWindow, &this->cursorPosition.x, &this->cursorPosition.y);
 }
 
+/*-------------------- FPSCAMERACONTROLLER  GETTERS / SETTERS ----------------------------*/
 void FPSCameraController::setCamera(render::Camera& cam)
 {
     this->camera = &cam;
 }
 
-
-/*-------------------- FPSCAMERACONTROLLER  GETTERS / SETTERS ----------------------------*/
 float FPSCameraController::getLinearSpeed()
 {
     return this->linearSpeed;
@@ -55,6 +54,9 @@ void FPSCameraController::update()
     if (this->window == nullptr || this->camera == nullptr)
         return;
 
+    // Camera options
+    this->updateOptions();
+
     // Camera translation
     this->updateTranslation();
 
@@ -77,6 +79,13 @@ void FPSCameraController::update()
 
  // PRIVATE ----------------------------------------------------------------------------------------------------------------------------
  // ------------------------------------------------------------------------------------------------------------------------------------
+void FPSCameraController::updateOptions()
+{
+    GLFWwindow* glfwWindow = this->window->getGLFWwindow();
+    
+    this->roolingActive = (glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+}
+
 void FPSCameraController::updateTranslation()
 {
     GLFWwindow* glfwWindow = this->window->getGLFWwindow();
@@ -132,6 +141,13 @@ void FPSCameraController::updateTranslation()
 void FPSCameraController::updateRoation()
 {
     GLFWwindow* glfwWindow = this->window->getGLFWwindow();
+
+    if (this->roolingActive == false)
+    {
+        glfwGetCursorPos(glfwWindow, &this->cursorPosition.x, &this->cursorPosition.y);
+        return;
+    }
+
     render::Camera& camera = *this->camera;
 
     float frameDuration = this->window->getFrameDurationSecond();
