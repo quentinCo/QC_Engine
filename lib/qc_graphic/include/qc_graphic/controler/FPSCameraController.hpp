@@ -37,7 +37,7 @@ private:
     Window*         window;
     render::Camera* camera;
 
-    bool roolingActive;
+    bool rollingIsActive;
 
     float linearSpeed;
     float rotationSpeed;
