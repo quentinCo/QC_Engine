@@ -45,6 +45,7 @@ static GLuint uPointLightInt;
 
 /*-------------------- TEST FUNCTIONS PROTOTYPE ----------------------------------*/
 static std::unique_ptr<qc::render::Mesh> makeCube();
+static std::unique_ptr<qc::render::Mesh> makePlan();
 static bool generateTestVertexShader(qc::render::program::Shader& vs);
 static bool generateTestFragmentShader(qc::render::program::Shader& fs);
 static bool makeTestProgram(qc::render::program::Program& program);
@@ -94,19 +95,21 @@ int Application::run()
 
         // Init Meshs
     meshCollection.emplace_back(makeCube());
-    const std::unique_ptr<qc::render::Mesh>& cube = meshCollection.back();
+    //meshCollection.emplace_back(makePlan());
+    const std::unique_ptr<qc::render::Mesh>& mesh = meshCollection.back();
 
         // Init Objects
     std::vector<app::Object3d> objects;
-    objects.emplace_back(cube.get());
+    objects.emplace_back(mesh.get());
 
     {
         auto& obj = objects.back();
         auto& trans = obj.getTransformation();
         trans.translate({ 0,0,-2 });
+        trans.scale(2);
     }
 
-    pointLight = app::PointLightInstance(glm::vec3(0, 5, 5), 10, glm::vec3(0, 1, 0));
+    pointLight = app::PointLightInstance(glm::vec3(0, 0, 5), 5, glm::vec3(0, 1, 0));
 
     // Save viewport size
     glm::ivec2 viewportSize = window.getViewportSize(); // CAUTION: Valid because the viewport is unsizeable
@@ -119,7 +122,7 @@ int Application::run()
         cameraController->update();
 
         renderScene(objects, viewportSize, defaultProgram);
-
+        /*
         for (auto& obj : objects)
         {
             auto& trans = obj.getTransformation();
@@ -128,6 +131,7 @@ int Application::run()
             const float angleZ = 1 / 400.f;
             trans.rotate(glm::vec3(angleX, angleY, angleZ));
         }
+        */
     }
 
     return 0;
@@ -205,7 +209,32 @@ static std::unique_ptr<qc::render::Mesh> makeCube()
         20, 23, 22
     };
 
-    return std::unique_ptr<qc::render::Mesh>(new qc::render::Mesh(vertices, indices));
+    return std::make_unique<qc::render::Mesh>(vertices, indices);
+}
+
+static std::unique_ptr<qc::render::Mesh> makePlan()
+{
+    glm::vec4 points[4] =
+    {
+        glm::vec4(-0.5, 0, -0.5, 1),
+        glm::vec4(0.5, 0, -0.5, 1),
+        glm::vec4(0.5, 0, 0.5, 1),
+        glm::vec4(-0.5, 0, 0.5, 1)
+    };
+
+    qc::render::Vertex vertices[4] = {
+        qc::render::Vertex(points[0], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,0)),
+        qc::render::Vertex(points[1], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,1)),
+        qc::render::Vertex(points[2], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,1)),
+        qc::render::Vertex(points[3], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,0))
+    };
+
+    unsigned int indices[6] = {
+        0, 3, 2,
+        0, 2, 1
+    };
+
+    return std::make_unique<qc::render::Mesh>(vertices, 4, indices, 6);
 }
 
 
@@ -231,7 +260,7 @@ R"(
 	void main()
 	{
         vPosition = uMVMatrix * aPosition;
-        vNormal = uNormalMatrix * aNormal;
+        vNormal = normalize(uNormalMatrix * aNormal);
         vTexCoord = aTexCoord;
         gl_Position = uMVPMatrix * aPosition;
 	}
@@ -241,6 +270,75 @@ R"(
     return vs.compile();
 }
 
+#if 1
+static bool generateTestFragmentShader(qc::render::program::Shader& fs)
+{
+    std::string fragmentShaderSrc =
+        R"(
+    #version 430
+
+    struct PointLight
+    {
+        vec4        position;
+        vec4        color;
+        float       intensity;
+    };
+
+    layout(origin_upper_left) in vec4 gl_FragCoord;    
+
+    uniform PointLight uPointLight;
+    uniform mat4 uViewMatrix;
+
+    in vec4 vPosition;
+    in vec4 vNormal;
+    in vec2 vTexCoord;
+
+    out vec4 fColor;
+
+    void checkerboard(in vec2 texCoord, inout vec4 color)
+    {
+        float scale = 3.0;
+        float sum = floor(texCoord.x * scale) + floor(texCoord.y * scale);
+        float modulo = mod(sum, 2); 
+        color =  vec4(color.xyz * modulo, 1);
+    } 
+
+    void main()
+    {
+        // Light
+        vec4 lightPos = uViewMatrix * uPointLight.position;
+        vec4 lightDir = normalize(lightPos - vPosition);
+
+        // Main vectors
+        //vec4 reflection = 2 * dot(lightDir, vNormal) * vNormal - lightDir;
+        vec4 reflection = 2 * dot(-lightDir, vNormal) * vNormal + lightDir;
+        //vec4 reflection = normalize(reflect(-lightDir, vNormal));
+        vec4 eyeDir = normalize(-vPosition);
+        
+        // Factors
+        float s = clamp((100 * dot(reflection, eyeDir) - 97), 0, 1);
+        float t = (dot(lightDir, vNormal) + 1) * 0.5;
+
+        // Colors
+        vec4 color = vec4(1);
+        checkerboard(vTexCoord, color);
+
+        vec4 colorWarm          = glm::vec4(0.5,0.5,0,1) + 0.25 * color;
+        vec4 colorCool          = glm::vec4(0,0,0.5,1) + 0.25 * color;
+        vec4 colorHightLight    = glm::vec4(1);
+        
+//color = vec4(reflection.xyz, 1);
+        color = s * uPointLight.color + ( 1 - s) * (t * colorWarm + (1 - t) * colorCool);
+
+
+        fColor = color;
+    }
+)";
+
+    fs.appendCode(fragmentShaderSrc);
+    return fs.compile();
+}
+#else
 static bool generateTestFragmentShader(qc::render::program::Shader& fs)
 {
     std::string fragmentShaderSrc =
@@ -277,7 +375,7 @@ R"(
     {
         // Light
         vec4 lightPos = uViewMatrix * uPointLight.position;
-        vec4 lightDir = uPointLight.position - vPosition;
+        vec4 lightDir = lightPos - vPosition;
         float fact = max(0, dot(lightDir, vNormal));
 
         vec4 light = uPointLight.color * fact;
@@ -311,6 +409,7 @@ R"(
     fs.appendCode(fragmentShaderSrc);
     return fs.compile();
 }
+#endif
 
 static bool makeTestProgram(qc::render::program::Program& program)
 {
