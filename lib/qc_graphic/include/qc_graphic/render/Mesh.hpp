@@ -57,6 +57,16 @@ public:
         return static_cast<GLsizei>(this->indices.size());
     }
 
+    GLsizei getNbVertices() const
+    {
+        return static_cast<GLsizei>(this->vertices.size());
+    }
+
+    GLsizei getNbTriangles() const
+    {
+        return static_cast<GLsizei>(this->indices.size() / 3);
+    }
+
 private:
     std::vector<Vertex>         vertices;
     std::vector<unsigned int>   indices;
