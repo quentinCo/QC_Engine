@@ -1,3 +1,7 @@
+#define _USE_MATH_DEFINES
+//#define NOMINMAX
+#include <cmath>
+
 #include <Application.hpp>
 
 // Native C++
@@ -46,6 +50,7 @@ static GLuint uPointLightInt;
 /*-------------------- TEST FUNCTIONS PROTOTYPE ----------------------------------*/
 static std::unique_ptr<qc::render::Mesh> makeCube();
 static std::unique_ptr<qc::render::Mesh> makePlan();
+static std::unique_ptr<qc::render::Mesh> makeSphere(int subDiv);
 static bool generateTestVertexShader(qc::render::program::Shader& vs);
 static bool generateTestFragmentShader(qc::render::program::Shader& fs);
 static bool makeTestProgram(qc::render::program::Program& program);
@@ -89,14 +94,20 @@ int Application::run()
     uNormalMatrix = defaultProgram.getUniformLocation("uNormalMatrix");
     uViewMatrix = defaultProgram.getUniformLocation("uViewMatrix"); 
     uMVMatrix = defaultProgram.getUniformLocation("uMVMatrix");
+
     uPointLightPos = defaultProgram.getUniformLocation("uPointLight.position");
     uPointLightCol = defaultProgram.getUniformLocation("uPointLight.color");
     uPointLightInt = defaultProgram.getUniformLocation("uPointLight.intensity");
 
         // Init Meshs
-    meshCollection.emplace_back(makeCube());
+    //meshCollection.emplace_back(makeCube());
     //meshCollection.emplace_back(makePlan());
+    meshCollection.emplace_back(makeSphere(20));
     const std::unique_ptr<qc::render::Mesh>& mesh = meshCollection.back();
+
+    std::cout << "Mesh: properties --------" << std::endl;
+    std::cout << "  - vertices: " << mesh->getNbVertices() << std::endl;
+    std::cout << "  - triangles: " << mesh->getNbTriangles() << std::endl;
 
         // Init Objects
     std::vector<app::Object3d> objects;
@@ -106,7 +117,7 @@ int Application::run()
         auto& obj = objects.back();
         auto& trans = obj.getTransformation();
         trans.translate({ 0,0,-2 });
-        trans.scale(2);
+        //trans.scale(2);
     }
 
     pointLight = app::PointLightInstance(glm::vec3(0, 0, 5), 5, glm::vec3(0, 1, 0));
@@ -238,6 +249,109 @@ static std::unique_ptr<qc::render::Mesh> makePlan()
 }
 
 
+static std::unique_ptr<qc::render::Mesh> makeSphere(int subDiv)
+{
+    std::vector<qc::render::Vertex> vertices;
+    std::vector<unsigned int> indices;
+
+    int k = subDiv * 2;
+
+    // Vertices generation
+    const float step = M_PI / float(subDiv);
+    const float halfPi = M_PI * 0.5;
+
+    glm::vec4 point;
+    glm::vec4 normal;
+    glm::vec2 uv;
+
+    auto generateVertex = [&](float angleZ, float angleY)
+    {
+        float cosAz = cos(angleZ);
+        float sinAz = sin(angleZ);
+        
+        float cosAy = cos(angleY);
+        float sinAy = sin(angleY);
+
+        normal.x = cosAy * cosAz;
+        normal.y = sinAz;
+        normal.z = sinAy * cosAz;
+        normal.w = 0;
+        glm::normalize(normal);
+
+        //std::cout << "N [ " << normal.x << " | " << normal.y << " | " << normal.z<< " ]" << std::endl;
+
+        point   = normal * glm::vec4(0.5);
+        point.w = 1;
+        //std::cout << "P [ " << point.x << " | " << point.y << " | " << point.z<< " ]" << std::endl;
+
+        glm::vec4 nNormal = -normal;
+
+        uv.x = 0;//0.5 + atan2(nNormal.z, nNormal.x) * 0.5 * M_PI;
+        uv.y = 0;//0.5 - asin(nNormal.y) * M_PI;
+
+        vertices.emplace_back(point, normal, uv);
+    };
+
+    generateVertex(halfPi, 0);
+
+    for (int i = 1; i < subDiv; ++i)
+    {
+        float angleZ = halfPi - i * step;
+        for (int j = 0; j < k; ++j)
+        {
+            float angleY = j * step;
+            generateVertex(angleZ, angleY);
+        }
+    }
+
+    generateVertex(-halfPi, 0);
+
+    // Indices generation
+    //  Pole
+    int north = 0;
+    int south = vertices.size() - 1;
+    for (int i = 0; i < k; ++i)
+    {
+        // North
+        indices.push_back(north);
+        indices.push_back(north + 1 + (i + 1) % k);
+        indices.push_back(north + 1 + i);
+
+        // South
+        indices.push_back(south - 1 - (i + 1) % k);
+        indices.push_back(south - 1 - i);
+        indices.push_back(south);
+    }
+
+    // Ecuador
+    for (int i = 0; i < subDiv - 2; ++i)
+    {
+        int line = 1 + i * k;
+        for (int j = 0; j < k; ++j)
+        {
+            int jP1 = (j + 1) % k;
+            indices.push_back(line + j);
+            indices.push_back(line + jP1 + k);
+            indices.push_back(line + j + k);
+
+            indices.push_back(line + j);
+            indices.push_back(line + jP1);
+            indices.push_back(line + jP1 + k);
+        }
+    }
+
+    //std::cout << "sub: " << subDiv << std::endl;
+    //std::cout << "k: " << k << std::endl;
+    //std::cout << "last: " << vertices.size() - 1 << std::endl;
+    //for (int i = 0; i < indices.size(); i += 3)
+    //{
+    //    std::cout << "[ " << indices[i] << " | "<< indices[i + 1] << " | "<< indices[i + 2] << " ]"<< std::endl;
+    //}
+
+    return std::make_unique<qc::render::Mesh>(vertices, indices);
+}
+
+
 static bool generateTestVertexShader(qc::render::program::Shader& vs)
 {
     std::string vertexShaderSrc =
@@ -250,7 +364,6 @@ R"(
 
 	uniform mat4 uMVPMatrix;
     uniform mat4 uNormalMatrix;
-    uniform mat4 uViewMatrix;
     uniform mat4 uMVMatrix;
 
     out vec4 vPosition;
@@ -306,22 +419,21 @@ static bool generateTestFragmentShader(qc::render::program::Shader& fs)
     void main()
     {
         // Light
-        vec4 lightPos = uViewMatrix * uPointLight.position;
+        vec4 lightPos = uViewMatrix * uPointLight.position; // OPTIMISATION: Can be moved on CPU (Add preprocess on CPU, but not changed transfered data quantity)
         vec4 lightDir = normalize(lightPos - vPosition);
 
         // Main vectors
-        //vec4 reflection = 2 * dot(lightDir, vNormal) * vNormal - lightDir;
-        vec4 reflection = 2 * dot(-lightDir, vNormal) * vNormal + lightDir;
-        //vec4 reflection = normalize(reflect(-lightDir, vNormal));
+        //vec4 reflection = 2 * dot(-lightDir, vNormal) * vNormal + lightDir;
+        vec4 reflection = normalize(reflect(-lightDir, vNormal));
         vec4 eyeDir = normalize(-vPosition);
         
         // Factors
-        float s = clamp((100 * dot(reflection, eyeDir) - 97), 0, 1);
-        float t = (dot(lightDir, vNormal) + 1) * 0.5;
+        float s = clamp((100.0 * dot(reflection, eyeDir) - 97.0), 0.0, 1.0);
+        float t = (dot(lightDir, vNormal) + 1.0) * 0.5;
 
         // Colors
         vec4 color = vec4(1);
-        checkerboard(vTexCoord, color);
+        //checkerboard(vTexCoord, color);
 
         vec4 colorWarm          = glm::vec4(0.5,0.5,0,1) + 0.25 * color;
         vec4 colorCool          = glm::vec4(0,0,0.5,1) + 0.25 * color;
@@ -438,18 +550,19 @@ static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& view
     // Get common matrices
     glm::mat4 viewMatrix = camera.getViewMatrix();
     glm::mat4 projMatrix = camera.getProjMatrix(viewportSize);
-
+    
     // Object rendering lambda
     auto renderObject = [&](app::Object3d& obj)
     {
         qc::Transform& transform = obj.getTransformation();
 
         glm::mat4 modelMatrix   = transform.getMatrix();
+        glm::mat4 rotateMatrix  = transform.getRotateMatrix();
 
         glm::mat4 mvMatrix      = viewMatrix * modelMatrix;
         glm::mat4 mvpMatrix     = projMatrix * mvMatrix;
-        glm::mat4 normalMatrix  = glm::transpose(glm::inverse(mvMatrix)); // TODO: check the normal must be only affected and so by rotation -> rotateMatrix^-1 = rotateMatrix^T
-
+        glm::mat4 normalMatrix  = viewMatrix * rotateMatrix;/*glm::transpose(glm::inverse(mvMatrix));*/ // The normal is only affected by the rotation, but for rotation matrix (rotation^-1) = (rotation^T) so (rotation^T)^T = rotation 
+        
         glUniformMatrix4fv(uMVPMatrix   , 1, GL_FALSE, glm::value_ptr(mvpMatrix));
         glUniformMatrix4fv(uMVMatrix    , 1, GL_FALSE, glm::value_ptr(mvMatrix));        
         glUniformMatrix4fv(uNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
@@ -470,7 +583,7 @@ static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& view
 
     // Clear buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(1, 0, 0, 1);
+    glClearColor(0.25, 0.25, 0.25, 1);
 
     // Enable options
     glEnable(GL_DEPTH_TEST);
