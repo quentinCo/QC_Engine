@@ -132,7 +132,7 @@ void Transform::computeMatrix()
     this->positionMatrix    = glm::mat4();
     this->rotateMatrix     = glm::mat4();
     this->scalingMatrix     = glm::mat4();
-
+    
     // Translate
     this->positionMatrix[3] = this->position;
 
@@ -168,7 +168,11 @@ void Transform::computeMatrix()
     /*
     this->matrix = glm::mat4();
     glm::vec3 pos = this->position;
+    this->matrix = glm::rotate(this->matrix, this->orientation.x, glm::vec3(1, 0, 0));
+    this->matrix = glm::rotate(this->matrix, this->orientation.y, glm::vec3(0, 1, 0));
+    this->matrix = glm::rotate(this->matrix, this->orientation.z, glm::vec3(0, 0, 1));
     this->matrix = glm::translate(this->matrix, pos);
     */
+
     this->isValidMatrix = true;
 }
