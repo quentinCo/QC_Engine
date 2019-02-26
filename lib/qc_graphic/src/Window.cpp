@@ -27,7 +27,7 @@ extern "C"
 
 /*-------------------- WINDOW  CONSTRUCTOR ----------------------------------*/
 Window::Window()
-    : Window(0, 0, "No Name")
+    : Window(500, 500, "No Name")
 {}
 
 Window::Window(int width, int height, const std::string& name, int quitKey)
