@@ -6,6 +6,7 @@
 
 // Native C++
 #include <iostream>
+#include <algorithm>
 
 #include <memory>
 
@@ -26,6 +27,9 @@
 // Application
 #include <instances\Object3d.hpp>
 #include <instances\PointLightInstance.hpp>
+
+
+#define THRESHOLD 0.00001
 
 /*-------------------- TEMPORARY TEST VARIABLES ----------------------------------*/
 // TODO move camera manage in a app::Camera object
@@ -49,13 +53,14 @@ static GLuint uPointLightInt;
 
 /*-------------------- TEST FUNCTIONS PROTOTYPE ----------------------------------*/
 static std::unique_ptr<qc::render::Mesh> makeCube();
+static std::unique_ptr<qc::render::Mesh> makeDebugDeformPlan();
 static std::unique_ptr<qc::render::Mesh> makePlan();
 static std::unique_ptr<qc::render::Mesh> makeSphere(int subDiv);
 static bool generateTestVertexShader(qc::render::program::Shader& vs);
 static bool generateTestFragmentShader(qc::render::program::Shader& fs);
 static bool makeTestProgram(qc::render::program::Program& program);
 
-static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& viewportSize, const qc::render::program::Program& prog);
+static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& viewportSize, const qc::render::program::Program& prog, bool wireFrame = false, bool depthTest = true);
 
 
 
@@ -85,9 +90,9 @@ int Application::run()
     cameraController = &fpsCameraController;
 
         //Init Program
-    //qc::render::program::Program defaultProgram = qc::render::program::GetDefaultProgram();
-    qc::render::program::Program defaultProgram;
-    makeTestProgram(defaultProgram);
+    qc::render::program::Program defaultProgram = qc::render::program::GetDefaultProgram();
+    //qc::render::program::Program defaultProgram;
+    //makeTestProgram(defaultProgram);
 
         // Init Uniform
     uMVPMatrix = defaultProgram.getUniformLocation("uMVPMatrix");
@@ -101,8 +106,9 @@ int Application::run()
 
         // Init Meshs
     //meshCollection.emplace_back(makeCube());
+    //meshCollection.emplace_back(makeDebugDeformPlan());
     //meshCollection.emplace_back(makePlan());
-    meshCollection.emplace_back(makeSphere(20));
+    meshCollection.emplace_back(makeSphere(30));
     const std::unique_ptr<qc::render::Mesh>& mesh = meshCollection.back();
 
     std::cout << "Mesh: properties --------" << std::endl;
@@ -117,6 +123,7 @@ int Application::run()
         auto& obj = objects.back();
         auto& trans = obj.getTransformation();
         trans.translate({ 0,0,-2 });
+        //trans.rotateDeg({ 90,0,0 });
         //trans.scale(2);
     }
 
@@ -132,7 +139,7 @@ int Application::run()
 
         cameraController->update();
 
-        renderScene(objects, viewportSize, defaultProgram);
+        renderScene(objects, viewportSize, defaultProgram, false);
         /*
         for (auto& obj : objects)
         {
@@ -223,6 +230,31 @@ static std::unique_ptr<qc::render::Mesh> makeCube()
     return std::make_unique<qc::render::Mesh>(vertices, indices);
 }
 
+static std::unique_ptr<qc::render::Mesh> makeDebugDeformPlan()
+{
+    glm::vec4 points[4] =
+    {
+        glm::vec4(-0.5, 0, -0.5, 1),
+        glm::vec4(0.5, 0, -0.5, 1),
+        glm::vec4(0.25, 0, 0.5, 1),
+        glm::vec4(-0.25, 0, 0.5, 1)
+    };
+
+    qc::render::Vertex vertices[4] = {
+        qc::render::Vertex(points[0], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,1)),
+        qc::render::Vertex(points[1], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,1)),
+        qc::render::Vertex(points[2], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,0)),
+        qc::render::Vertex(points[3], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,0))
+    };
+
+    unsigned int indices[6] = {
+        0, 3, 2,
+        0, 2, 1
+    };
+
+    return std::make_unique<qc::render::Mesh>(vertices, 4, indices, 6);
+}
+
 static std::unique_ptr<qc::render::Mesh> makePlan()
 {
     glm::vec4 points[4] =
@@ -234,10 +266,10 @@ static std::unique_ptr<qc::render::Mesh> makePlan()
     };
 
     qc::render::Vertex vertices[4] = {
-        qc::render::Vertex(points[0], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,0)),
-        qc::render::Vertex(points[1], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,1)),
-        qc::render::Vertex(points[2], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,1)),
-        qc::render::Vertex(points[3], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,0))
+        qc::render::Vertex(points[0], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,1)),
+        qc::render::Vertex(points[1], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,1)),
+        qc::render::Vertex(points[2], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(1,0)),
+        qc::render::Vertex(points[3], glm::normalize(glm::vec4(0,1,0,0)), glm::vec2(0,0))
     };
 
     unsigned int indices[6] = {
@@ -254,15 +286,22 @@ static std::unique_ptr<qc::render::Mesh> makeSphere(int subDiv)
     std::vector<qc::render::Vertex> vertices;
     std::vector<unsigned int> indices;
 
+    subDiv = std::max(2, subDiv);
     int k = subDiv * 2;
 
     // Vertices generation
     const float step = M_PI / float(subDiv);
     const float halfPi = M_PI * 0.5;
+    const float uvStepFactor = 1 / (step * subDiv);
 
     glm::vec4 point;
     glm::vec4 normal;
     glm::vec2 uv;
+
+    auto roundZero = [](const float value) -> float
+    {
+        return (std::abs(value) > THRESHOLD) ? value : 0;
+    };
 
     auto generateVertex = [&](float angleZ, float angleY)
     {
@@ -272,71 +311,108 @@ static std::unique_ptr<qc::render::Mesh> makeSphere(int subDiv)
         float cosAy = cos(angleY);
         float sinAy = sin(angleY);
 
-        normal.x = cosAy * cosAz;
-        normal.y = sinAz;
-        normal.z = sinAy * cosAz;
+        normal.x = roundZero(cosAy * cosAz);
+        normal.y = roundZero(sinAz);
+        normal.z = roundZero(sinAy * cosAz);
         normal.w = 0;
         glm::normalize(normal);
 
-        //std::cout << "N [ " << normal.x << " | " << normal.y << " | " << normal.z<< " ]" << std::endl;
-
         point   = normal * glm::vec4(0.5);
         point.w = 1;
-        //std::cout << "P [ " << point.x << " | " << point.y << " | " << point.z<< " ]" << std::endl;
 
         glm::vec4 nNormal = -normal;
 
-        uv.x = 0;//0.5 + atan2(nNormal.z, nNormal.x) * 0.5 * M_PI;
-        uv.y = 0;//0.5 - asin(nNormal.y) * M_PI;
-
+        uv.x = angleY * uvStepFactor;// 0.5 + atan2(nNormal.z, nNormal.x) * 0.5 * M_PI;
+        uv.y = angleZ * uvStepFactor;// 0.5 - asin(nNormal.y) * M_PI;
+                     
         vertices.emplace_back(point, normal, uv);
+        //std::cout << "[" << std::endl;
+        //std::cout << "  Pos: " << point.x << " | " << point.y << " | " << point.z << std::endl;
+        //std::cout << "  Nor: " << nNormal.x << " | " << nNormal.y << " | " << nNormal.z << std::endl;
+        //std::cout << "  UV : " << uv.x << " | " << uv.y << std::endl;
+        //std::cout << "]" << std::endl;
     };
 
-    generateVertex(halfPi, 0);
+    auto generatePole = [&](float angleZ, int nbStep)
+    {
+        float cosAz = cos(angleZ);
+        float sinAz = sin(angleZ);
+
+        normal.x = roundZero(cosAz);
+        normal.y = roundZero(sinAz);
+        normal.z = roundZero(cosAz);
+        normal.w = 0;
+        glm::normalize(normal);
+
+        point = normal * glm::vec4(0.5);
+        point.w = 1;
+
+        glm::vec4 nNormal = -normal;
+
+        float subDivFactor = 1.0 / subDiv;
+        for (int i = 0; i < nbStep; ++i)
+        {
+            uv.x = subDivFactor + 2 * i * subDivFactor;
+            uv.y = angleZ * uvStepFactor;
+            vertices.emplace_back(point, normal, uv);
+
+            //std::cout << "[" << std::endl;
+            //std::cout << "  Pos: " << point.x << " | " << point.y << " | " << point.z << std::endl;
+            //std::cout << "  Nor: " << nNormal.x << " | " << nNormal.y << " | " << nNormal.z << std::endl;
+            //std::cout << "  UV : " << uv.x << " | " << uv.y << std::endl;
+            //std::cout << "]" << std::endl;
+        }
+    };
+
+    generatePole(halfPi, subDiv + 1);
 
     for (int i = 1; i < subDiv; ++i)
     {
         float angleZ = halfPi - i * step;
-        for (int j = 0; j < k; ++j)
+        for (int j = 0; j <= k; ++j)
         {
             float angleY = j * step;
             generateVertex(angleZ, angleY);
         }
     }
 
-    generateVertex(-halfPi, 0);
+    generatePole(-halfPi, subDiv + 1);
 
     // Indices generation
     //  Pole
-    int north = 0;
-    int south = vertices.size() - 1;
+    int kP1 = k + 1;
+
+    int northLine = subDiv + 1;
+    int southLine = vertices.size() - ((subDiv + 1) + (k + 1));
     for (int i = 0; i < k; ++i)
     {
         // North
-        indices.push_back(north);
-        indices.push_back(north + 1 + (i + 1) % k);
-        indices.push_back(north + 1 + i);
+        int northPole = floor((northLine + i * 0.5) - (subDiv + 1));
+        indices.push_back(northPole);
+        indices.push_back(northLine + i + 1);
+        indices.push_back(northLine + i);
 
         // South
-        indices.push_back(south - 1 - (i + 1) % k);
-        indices.push_back(south - 1 - i);
-        indices.push_back(south);
+        int southPole = floor((southLine + i * 0.5) + (k + 1));
+        indices.push_back(southPole);
+        indices.push_back(southLine + i);
+        indices.push_back(southLine + i + 1);
     }
 
     // Ecuador
     for (int i = 0; i < subDiv - 2; ++i)
     {
-        int line = 1 + i * k;
+        int line = (subDiv + 1) + i * kP1;//1 + i * kP1;
         for (int j = 0; j < k; ++j)
         {
-            int jP1 = (j + 1) % k;
+            int jP1 = j + 1;
             indices.push_back(line + j);
-            indices.push_back(line + jP1 + k);
-            indices.push_back(line + j + k);
+            indices.push_back(line + jP1 + kP1);
+            indices.push_back(line + j + kP1);
 
             indices.push_back(line + j);
             indices.push_back(line + jP1);
-            indices.push_back(line + jP1 + k);
+            indices.push_back(line + jP1 + kP1);
         }
     }
 
@@ -545,7 +621,7 @@ static bool makeTestProgram(qc::render::program::Program& program)
     return program.link();
 }
 
-static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& viewportSize, const qc::render::program::Program& prog) // objs not const due to the possible update of the matrix from transform
+static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& viewportSize, const qc::render::program::Program& prog, bool wireframe, bool depthTest) // objs not const due to the possible update of the matrix from transform
 {
     // Get common matrices
     glm::mat4 viewMatrix = camera.getViewMatrix();
@@ -583,11 +659,16 @@ static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& view
 
     // Clear buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.25, 0.25, 0.25, 1);
+    glClearColor(1.0, 0, 1.0, 1);
 
     // Enable options
-    glEnable(GL_DEPTH_TEST);
+    if(depthTest)
+        glEnable(GL_DEPTH_TEST);
+
     glEnable(GL_CULL_FACE);
+
+    if(wireframe)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glCullFace(GL_FRONT);
     glFrontFace(GL_CW);
@@ -610,6 +691,7 @@ static void renderScene(std::vector<app::Object3d>& objs, const glm::ivec2& view
         renderObject(obj);
 
     // Disable options
-    glDisable(GL_DEPTH_TEST);
+    if (depthTest)
+        glDisable(GL_DEPTH_TEST);
 }
 
