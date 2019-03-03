@@ -222,9 +222,9 @@ out vec2 vTexCoord;
 
 void main()
 {
-vNormal = uNormalMatrix * aNormal;
-vTexCoord = aTexCoord;
-gl_Position = uMVPMatrix * aPosition;
+    vNormal = /*uNormalMatrix * */aNormal;
+    vTexCoord = aTexCoord;
+    gl_Position = uMVPMatrix * aPosition;
 }
 )";
 
@@ -247,19 +247,19 @@ out vec4 fColor;
 
 void checkerboard(in vec2 texCoord, inout vec4 color)
 {
-float scale = 3.0;
-float sum = floor(texCoord.x * scale) + floor(texCoord.y * scale);
-float modulo = mod(sum, 2); 
-color =  vec4(color.xyz * modulo, 1);
+    float scale = 3.0;
+    float sum = floor(texCoord.x * scale) + floor(texCoord.y * scale);
+    float modulo = mod(sum, 2); 
+    color =  vec4(color.xyz * modulo, 1);
 } 
 
 void main()
 {
-vec4 color = vec4(1, 0.5, 0, 1);
-vec4 dir = normalize(vec4(0.25,0.25,0.75,0));
+    vec4 color = vec4(1, 0.5, 0, 1);
+    vec4 dir = normalize(vec4(0.25, 0.75, 0.25,0));
 
-checkerboard(vTexCoord, color);
-fColor = dot(vNormal, dir) * color;
+    checkerboard(vTexCoord, color);
+    fColor = /*dot(vNormal, dir) * */color;
 }
 )";
 
