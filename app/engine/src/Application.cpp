@@ -24,6 +24,8 @@
 
 #include <qc_graphic\render\programs\Program.hpp>
 
+#include <qc_graphic\Image.hpp>
+
 // Application
 #include <instances\Object3d.hpp>
 #include <instances\PointLightInstance.hpp>
@@ -150,6 +152,40 @@ int Application::run()
             trans.rotate(glm::vec3(angleX, angleY, angleZ));
         }
         */
+
+        if (glfwGetKey(this->window.getGLFWwindow(), GLFW_KEY_P) == GLFW_PRESS)
+        {
+            bool res = true;
+            #if 1
+                qc::Image image(viewportSize.x, viewportSize.y, qc::ColorFormat::RGBA);
+                auto* data = image.getData();
+                glReadPixels(0, 0, viewportSize.x, viewportSize.y, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            #else
+                std::string path = ".\\lion_bump.png";
+                qc::Image image;
+                res = qc::Image::read(path, image);
+            #endif
+
+            // Debug Code
+            //float step = viewportSize.x / 3.0;
+            //for (int i = 0; i < viewportSize.x * viewportSize.y; ++i)
+            //{
+            //    int y = i / viewportSize.x;
+            //    int x = i - y * viewportSize.x;
+            //    int a = x / step;
+            //    unsigned char value = (a % 2 == 0 || a == 0) ? 0xff : 0x00;
+            //
+            //    int index = i * qc::ColorFormat::RGBA;
+            //    data[index] = (a % 2 == 0 || a == 0) ? 0xff : 0x00;;
+            //    data[index + 1] = 0;
+            //    data[index + 2] = (a % 2 == 1) ? 0xff : 0x00;;
+            //    data[index + 3] = 0xff;
+            //}
+            
+            if(res)
+                qc::Image::write(image, ".\\test", qc::FileFormat::PNG, 50);
+        }
+
     }
 
     return 0;

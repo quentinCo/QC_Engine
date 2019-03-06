@@ -59,6 +59,34 @@ endif()
 		${QC_GRAPHIC_SHADER_FILES}
 	)
 
+#	function(set_subDir_filter _rel_dir _sub_dir _file_list)
+#		message("_sub_dir --> " ${_sub_dir})
+#		foreach(_source IN ITEMS ${_file_list})
+#			message("_source --> " "${_source}")
+#			get_filename_component(_src_root_path ${_rel_dir} REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
+#			message("_src_root_path --> " "${_src_root_path}")
+#			get_filename_component(_source_path "${_source}" PATH)
+#			message("_source_path --> " "${_source_path}")
+#			file(RELATIVE_PATH _source_path_rel "${_src_root_path}" "${_source_path}")
+#			string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
+#			message("_group_path --> " "${_group_path}")
+#			string(FIND "${_group_path}" ${_sub_dir} _src_pos)
+#			message("_src_pos --> " "${_src_pos}")
+#			string(LENGTH "${_group_path}" _length)
+#			message("_length --> " "${_length}")
+#			string(SUBSTRING "${_group_path}" "${_src_pos}" -1 _src_subdir)
+#			message("_src_subdir --> " "${_src_subdir}")
+#			source_group("${_src_subdir}" FILES "${_source}")
+#			
+#		endforeach()
+#	endfunction()
+#	
+#	SET(_arg "include")
+#	set_subDir_filter(${QC_GRAPHIC_DIR}/include/qc_graphic "${_arg}" ${QC_GRAPHIC_INCLUDE_FILES})
+#	SET(_arg "src")
+#	set_subDir_filter(${QC_GRAPHIC_DIR}/src/ "${_arg}" ${QC_GRAPHIC_SRC_FILES})
+	
+	
 
 set(LIBRARIES ${LIBRARIES} qc_graphic)
 
@@ -136,11 +164,12 @@ include_directories(${GLM_DIR})
 	#set(LIBRARIES ${LIBRARIES} imgui)
 	include_directories(${IMGUI_DIR})
 
-			# stb
-	set(STB_DIR third-party/stb)
-	#set(LIBRARIES ${LIBRARIES} stb)
-	include_directories(${STB_DIR})
 ]]
+
+		# stb
+set(STB_DIR third-party/stb)
+#set(LIBRARIES ${LIBRARIES} stb)
+include_directories(${STB_DIR})
 
 # App files
 set(APP_DIR "app/engine")
