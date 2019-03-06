@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="image_test" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="stblib" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=image_test - Win32 Debug
+CFG=stblib - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "image_test.mak".
+!MESSAGE NMAKE /f "stblib.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "image_test.mak" CFG="image_test - Win32 Debug"
+!MESSAGE NMAKE /f "stblib.mak" CFG="stblib - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "image_test - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "image_test - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "stblib - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "stblib - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=image_test - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "image_test - Win32 Release"
+!IF  "$(CFG)" == "stblib - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -52,7 +52,7 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 
-!ELSEIF  "$(CFG)" == "image_test - Win32 Debug"
+!ELSEIF  "$(CFG)" == "stblib - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -62,7 +62,7 @@ LINK32=link.exe
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug\image_test"
+# PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
 # ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I ".." /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /GZ /c
@@ -80,23 +80,23 @@ LINK32=link.exe
 
 # Begin Target
 
-# Name "image_test - Win32 Release"
-# Name "image_test - Win32 Debug"
+# Name "stblib - Win32 Release"
+# Name "stblib - Win32 Debug"
 # Begin Source File
 
-SOURCE=.\image_test.c
+SOURCE=.\prerelease\stb_lib.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\image_write_test.c
+SOURCE=..\stb_regex.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\stb_image.h
+SOURCE=.\stblib_test.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\stb_image_write.h
+SOURCE=.\stblib_test_companion.c
 # End Source File
 # End Target
 # End Project
