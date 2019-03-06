@@ -124,7 +124,7 @@ bool Shader::checkCompilationError()
         GLint maxLength = 0;
         glGetShaderiv(this->id, GL_INFO_LOG_LENGTH, &maxLength);
 
-        std::unique_ptr<char> errorLog(new char[maxLength]);
+        std::unique_ptr<char[]> errorLog(new char[maxLength]);
         glGetShaderInfoLog(this->id, maxLength, &maxLength, errorLog.get());
 
         qc::Useful::PrintError("SHADER COMPILATION", errorLog.get());

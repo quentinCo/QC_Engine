@@ -154,7 +154,7 @@ bool Program::checkLinkError()
         GLint maxLength = 0;
         glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &maxLength);
 
-        std::unique_ptr<char> errorLog(new char[maxLength]);
+        std::unique_ptr<char[]> errorLog(new char[maxLength]);
         glGetProgramInfoLog(this->id, maxLength, &maxLength, errorLog.get());
 
         qc::Useful::PrintError("PROGRAM LINKING", errorLog.get());
